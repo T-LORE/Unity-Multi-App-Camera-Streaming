@@ -5,7 +5,7 @@ using System.Net.Sockets;
 using UnityEngine;
 
 /// <summary>
-/// 아래 링크 코드를 참고하였음
+/// Referenced the code from the following link:
 /// 1. https://code-examples.net/ko/q/28bd211
 /// </summary>
 public class BytesTcpClient : MonoBehaviour {  	
@@ -63,7 +63,7 @@ public class BytesTcpClient : MonoBehaviour {
 			return;
 		
 		QuitClient();
-		Debug.Log($"◆◇◇(1)미러링TCP - ThreadStart ((info)ip:{_ip}/port:{_port}))");
+		Debug.Log($"MirroringTCP - ThreadStart ((info)ip:{_ip}/port:{_port}))");
 		Loom.RunAsync(ConnectAndWait);
 	}  	
 	
@@ -127,7 +127,7 @@ public class BytesTcpClient : MonoBehaviour {
 	            catch (Exception e)
 	            {
 		            _isConnected = false;
-		            Debug.Log("◇◇◇(-1)미러링TCP - Exception " + e);
+					Debug.LogError($"Error occurred while sending data: {e.Message}");
 	            }
 	            finally
 	            {
@@ -186,17 +186,17 @@ public class BytesTcpClient : MonoBehaviour {
 	    bytesToSendCount.CopyTo(fullBytes, 0);
     }
 
-    private void ConnectAndWait() {
+	private void ConnectAndWait() {
 		try { 			
 			_isConnected = false;
 			_tcpClient = new TcpClient();
-			Debug.Log($"◆◆◇(2)미러링TCP - 서버 접속 대기... ((info)ip:{_ip}/port:{_port}))");
+			Debug.Log($"Connecting to server... ((info)ip:{_ip}/port:{_port})");
 			_tcpClient.Connect(IPAddress.Parse(_ip), _port);
-			Debug.Log($"◆◆◆(3)미러링TCP - 서버 연결 완료... ((info)ip:{_ip}/port:{_port})");
+			Debug.Log($"Successfully connected to server. ((info)ip:{_ip}/port:{_port})");
 			_isConnected = true;
 		}         
 		catch (SocketException socketException) {             
-			Debug.Log("◇◇◇(-1)미러링TCP - SocketException " + socketException);
+			Debug.Log($"SocketException occurred: {socketException}");
 		}     
 	}
 
@@ -207,7 +207,7 @@ public class BytesTcpClient : MonoBehaviour {
 			_tcpClient?.Close();
 		} 		
 		catch (Exception e) { 	
-			Debug.Log("◇◇◇(-1)미러링TCP - Exception " + e);
+			Debug.Log($"Exception occurred while closing the client: {e}");
 		} 
 	}
 

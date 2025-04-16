@@ -51,20 +51,20 @@ public class BytesTcpServer : MonoBehaviour {
 	}
 
 	private void ReadLoop () { 		
-		Debug.Log($"◆◇◇(1)미러링TCP - ReadLoop Start (port:{_port})");
+		Debug.Log($"TCP - ReadLoop Start (port:{_port})");
 		try {
 			_tcpListener = new TcpListener(_ipAddress, _port); 			
 			_tcpListener.Start();     
 
 			while (true)
 			{
-				Debug.Log($"◆◆◇(2)미러링TCP - 클라이언트 접속을 대기 중...(port:{_port})");
+				Debug.Log($"TCP - Waiting for client connection...(port:{_port})");
 				isConnected = false;
 				_onConnected?.Invoke(false);
 				_connectedClient = _tcpListener.AcceptTcpClient();
 				isConnected = true;
 				_onConnected?.Invoke(true);
-				Debug.Log($"◆◆◆(3)미러링TCP - 클라이언트 연결 완료...(port:{_port})");
+				Debug.Log($"TCP - Client connected...(port:{_port})");
 
 				while (true)
 				{
@@ -92,14 +92,14 @@ public class BytesTcpServer : MonoBehaviour {
 					}
 					catch (Exception e)
 					{
-						Debug.Log($"◇◇◇(0)미러링TCP - 연결이 끊기거나, Data를 못 받은 상태(detail:{e}))");
+						Debug.Log($"TCP - Connection lost or failed to receive data (detail:{e}))");
 						break;
 					}
 				}
 			} 		
 		} 		
 		catch (SocketException socketException) { 			
-			Debug.Log("◇◇◇(-1)미러링TCP - SocketException " + socketException);
+			Debug.Log("TCP - SocketException " + socketException);
 		}     
 	}
 
