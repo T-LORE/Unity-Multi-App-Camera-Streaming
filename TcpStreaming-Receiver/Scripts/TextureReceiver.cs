@@ -5,11 +5,20 @@ public class TextureReceiver : MonoBehaviour
 {
     [Header("Network")] 
     public int port = 56666;
+    public string ipAddress = "127.0.0.1";
     
     [Header("ReceivedTexture")]
     public Texture2D receivedTexture;
     
     private BytesTcpServer _bytesTcpServer;
+
+    [ContextMenu("Connect")]
+    public void Connect()
+    {
+        if (_bytesTcpServer == null)
+            _bytesTcpServer = gameObject.AddComponent<BytesTcpServer>();
+        _bytesTcpServer.BeginServer(ipAddress, port, ProcessImageData);
+    }
 
     private void Start()
     {
@@ -18,10 +27,7 @@ public class TextureReceiver : MonoBehaviour
 
     private void Init()
     {
-        //Create Server
-        if (_bytesTcpServer == null)
-            _bytesTcpServer = gameObject.AddComponent<BytesTcpServer>();
-        _bytesTcpServer.BeginServer(port, ProcessImageData);
+        Connect();
     }
 
     private void ProcessImageData(byte[] byteData)

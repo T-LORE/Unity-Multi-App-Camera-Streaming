@@ -12,6 +12,7 @@ public class BytesTcpServer : MonoBehaviour {
 	private readonly int messageByteLength = 24;
 	
 	private byte[] _recvBytes;
+	private IPAddress _ipAddress;
 	private int _port = 56666;
 	
 	private TcpListener _tcpListener; 
@@ -27,9 +28,22 @@ public class BytesTcpServer : MonoBehaviour {
 		Loom.Initialize();
 	}
 
-	public void BeginServer(int port, Action<byte[]> bytesRecvAction = null, Action<bool> onConnected = null)
+	public void BeginServer(string ipAddress, int port, Action<byte[]> bytesRecvAction = null, Action<bool> onConnected = null)
 	{
-		_port = port;
+        if (ipAddress == string.Empty)
+		{
+            _ipAddress = IPAddress.Any;
+			Debug.Log($"IP Address is empty. Using Any IP Address (port:{_port})");
+        }
+
+		if (!IPAddress.TryParse(ipAddress, out _ipAddress))
+		{
+			Debug.LogError($"Invalid IP Address: {ipAddress}");
+            return;
+		}
+		Debug.Log($"IP Address: {_ipAddress} (port:{_port})");
+
+        _port = port;
 		_onBytesRecv = bytesRecvAction;
 		_onConnected = onConnected;
 		EndServer();
@@ -39,7 +53,7 @@ public class BytesTcpServer : MonoBehaviour {
 	private void ReadLoop () { 		
 		Debug.Log($"◆◇◇(1)미러링TCP - ReadLoop Start (port:{_port})");
 		try {
-			_tcpListener = new TcpListener(IPAddress.Any, _port); 			
+			_tcpListener = new TcpListener(_ipAddress, _port); 			
 			_tcpListener.Start();     
 
 			while (true)
