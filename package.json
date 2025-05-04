@@ -2,20 +2,18 @@
   "name": "com.tlore.unity-camera-streaming",
   "version": "1.0.0",
   "displayName": "Unity Camera Streaming",
-
   "samples": [
     {
-        "displayName": "Reciever Samples",
-        "description": "Contains sample setup for reciever",
-        "path": "Samples~/SamplesReceiver"
+      "displayName": "Reciever Samples",
+      "description": "Contains sample setup for reciever",
+      "path": "Samples~/SamplesReceiver"
     },
     {
-        "displayName": "Sender Samples",
-        "description": "Contains sample setup for sender",
-        "path": "Samples~/SamplesSender"
+      "displayName": "Sender Samples",
+      "description": "Contains sample setup for sender",
+      "path": "Samples~/SamplesSender"
     }
-],
-
+  ],
   "dependencies": {
     "com.unity.collab-proxy": "1.15.13",
     "com.unity.ide.rider": "2.0.7",
@@ -55,7 +53,9 @@
     "com.unity.modules.video": "1.0.0",
     "com.unity.modules.vr": "1.0.0",
     "com.unity.modules.wind": "1.0.0",
-    "com.unity.modules.xr": "1.0.0"
+    "com.unity.modules.xr": "1.0.0",
+    "com.unity.webrtc": "3.0.0-pre.8",
+    "com.endel.nativewebsocket": "1.1.5"
   },
   "description": "Enables real-time streaming of a Unity virtual camera's view between separate Unity applications using a peer-to-peer connection. Includes configurable parameters (resolution, FPS, codec, etc.) for optimizing quality and performance."
 }
