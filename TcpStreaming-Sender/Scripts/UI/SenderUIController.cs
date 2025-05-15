@@ -72,17 +72,22 @@ public class SenderUIController : MonoBehaviour
 
     [Header("Server")]
     [SerializeField] private TextureSenderServer _server;
+    [SerializeField] private float _updateCheckWaitTime; 
 
     private StreamSettings _streamSettings;
+    private float _serverStartTime;
+
+    private IEnumerator _updateServerInfoCoroutine;
 
     private void Start()
     {
+        _updateServerInfoCoroutine = UpdateServerInfo();
+
         ConfigureSlider(_delay, _delayStartLabel, _delayEndLabel, _delayCurrentLabel);
         ConfigureSlider(_bitrate, _bitrateStartLabel, _bitrateEndLabel, _bitrateCurrentLabel);
 
         _startStreamButton.onClick.AddListener(StartStreamButtonClicked);
         _endStreamButton.onClick.AddListener(StopStreamButtonClicked);
-
     }
 
     private void Update()
@@ -95,6 +100,10 @@ public class SenderUIController : MonoBehaviour
 
     private void StartStreamButtonClicked()
     {
+        _server.StartConnection();
+        _serverStartTime = Time.time;
+        StartCoroutine(_updateServerInfoCoroutine);
+
         UpdateStreamSettings();
         _settingsGameObject.SetActive(false);
         _infoGameObject.SetActive(true);
@@ -111,6 +120,9 @@ public class SenderUIController : MonoBehaviour
 
     private void StopStreamButtonClicked()
     {
+        _server.StopConnection();
+        StopCoroutine(_updateServerInfoCoroutine);
+
         _infoGameObject.SetActive(false);
         _settingsGameObject.SetActive(true);
 
@@ -121,6 +133,17 @@ public class SenderUIController : MonoBehaviour
         _translationOff.gameObject.SetActive(true);
 
         Debug.Log($"Stop stream button clicked!");
+    }
+
+    private IEnumerator UpdateServerInfo()
+    {
+        while (true)
+        {
+            _IPValue.text = $"{_server.listenIp}:{_server.port}";
+            _timerValue.text = $"{(int)(Time.time - _serverStartTime) / 3600:D2}:{(int)(Time.time - _serverStartTime) / 60 % 60:D2}:{(int)(Time.time - _serverStartTime) % 60:D2}";
+            _currentBitrateValue.text = $"NaN";
+            yield return new WaitForSeconds(_updateCheckWaitTime);
+        }
     }
 
     private void ConfigureSlider(Slider slider, Text startValLabel, Text endValLabel, Text curValLabel)

@@ -6,11 +6,12 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class TextureSenderServer : MonoBehaviour
 {
     [Header("Network")]
-    public string listenIp = "0.0.0.0"; // Слушать на всех интерфейсах
+    public string listenIp = "192.168.1.50"; // Слушать на всех интерфейсах
     public int port = 56666;
 
     [Header("Capture Settings")]
@@ -39,12 +40,27 @@ public class TextureSenderServer : MonoBehaviour
 
     private bool _isServerRunning = false;
 
-    void Start()
+    [Header("debug")]
+    public RawImage _testRawImage;
+
+    private void Update()
     {
-        // Инициализируем Loom, если он еще не инициализирован
-        Loom.Initialize();
+        if (_testRawImage != null && _captureTexture != null)
+        {
+            _testRawImage.texture = _captureTexture; // Для отладки
+        }
+    }
+
+    public void StartConnection()
+    {
         StartServer();
         StartCoroutine(CaptureLoop());
+    }
+
+    public void StopConnection()
+    {
+        StopServer();
+        StopAllCoroutines();
     }
 
     void OnDestroy()
