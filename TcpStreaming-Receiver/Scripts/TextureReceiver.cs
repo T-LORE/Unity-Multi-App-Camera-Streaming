@@ -6,6 +6,18 @@ using UnityEngine;
 using System.Threading;
 using System.Collections.Generic;
 
+public struct ReceiverSettings
+{
+    public string ServerIP;
+    public int ServerPort;
+
+    public override string ToString()
+    {
+        return $"ServerIP: {ServerIP}, " +
+               $"ServerPort: {ServerPort}";
+    }
+}
+
 public class TextureReceiver : MonoBehaviour
 {
     [Header("Network")]
@@ -18,9 +30,9 @@ public class TextureReceiver : MonoBehaviour
     private TcpClient _tcpClient;
     private NetworkStream _stream;
     private Thread _receiveThread;
-    private bool _isConnected = false;
-    private bool _isTryingToConnect = false;
-    private bool _stopReceiveThread = false;
+    public bool _isConnected = false;
+    public bool _isTryingToConnect = false;
+    public bool _stopReceiveThread = false;
 
     private byte[] _messageLengthBuffer = new byte[sizeof(int)];
     // private byte[] _frameTimestampBuffer = new byte[sizeof(float)]; // Если будем получать timestamp
@@ -28,14 +40,43 @@ public class TextureReceiver : MonoBehaviour
     private Queue<byte[]> _receivedFramesQueue = new Queue<byte[]>();
     private object _queueLock = new object();
 
-    void Start()
+    public void Connect()
     {
         Loom.Initialize();
         receivedTexture = new Texture2D(2, 2, TextureFormat.RGB24, false); // Начальная заглушка
         ConnectToServer();
     }
 
-    void Update()
+    public void Disconnect()
+    {
+        _stopReceiveThread = true; 
+        CloseConnection();
+    }
+
+    public void SetSettings (ReceiverSettings newSettings)
+    {
+        serverIp = newSettings.ServerIP;
+        serverPort = newSettings.ServerPort;
+
+        if (_isConnected)
+        {
+            Disconnect();
+            ConnectToServer();
+        }
+    }
+
+    public ReceiverSettings GetSettings()
+    {
+        ReceiverSettings settings = new ReceiverSettings
+        {
+            ServerIP = serverIp,
+            ServerPort = serverPort
+        };
+
+        return settings;
+    }
+
+    private void Update()
     {
         // Обрабатываем полученные кадры в основном потоке
         byte[] frameData = null;
@@ -53,7 +94,7 @@ public class TextureReceiver : MonoBehaviour
         }
     }
 
-    public void ConnectToServer()
+    private void ConnectToServer()
     {
         if (_isConnected || _isTryingToConnect) return;
 
