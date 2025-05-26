@@ -29,7 +29,7 @@ public class Receiver : MonoBehaviour
         }
 
         _mediaWebsocketClient.OnMessageAction += FrameRecieved;
-        _frameDecoder = new FrameDecoder(new Vector2(640, 480));
+        _frameDecoder = new FrameDecoder(new Vector2(_displayImage.uvRect.width, _displayImage.uvRect.height));
     }
 
     private void FrameRecieved(MessageEventArgs args)
@@ -45,7 +45,5 @@ public class Receiver : MonoBehaviour
         }
 
         _displayImage.texture = frameTexture;
-        _displayImage.SetNativeSize(); 
-
     }
 }

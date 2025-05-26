@@ -28,12 +28,48 @@ public class Sender : MonoBehaviour
 
     private FrameDecoder _frameDecoder;
 
+    private bool _sendFrames = false;
+
+    private Coroutine _sendFramesCoroutine;
+
     private void Start()
     {
         _textureCapturer = new TextureCapturer(_targetCamera, streamSettings);
         _textureEncoder = new TextureEncoder(streamSettings);
         _frameDecoder = new FrameDecoder(new Vector2(2,2));
+
     }
+
+    [ContextMenu("update settings")]
+    private void UpdateSettings()
+    {
+        UpdateSettings(streamSettings);
+    }
+    
+    public void UpdateSettings(StreamSettings newSettings)
+    {
+        if (newSettings == null)
+        {
+            Debug.LogError("UpdateSettings: newSettings is null.");
+            return;
+        }
+
+        if (_textureCapturer == null)
+        {
+            Debug.LogError("UpdateSettings: TextureCapturer is not initialized."); 
+        }
+
+
+        if (_textureEncoder == null)
+        {
+            Debug.LogError("UpdateSettings: TextureEncoder is not initialized."); 
+        }
+
+        streamSettings = newSettings;
+        _textureCapturer = new TextureCapturer(_targetCamera, streamSettings);
+        _textureEncoder = new TextureEncoder(streamSettings);
+    }
+
 
     [ContextMenu("Send Frame")]
     private void SendFrame()
@@ -64,6 +100,32 @@ public class Sender : MonoBehaviour
         }
     }
 
+    [ContextMenu("Start Sending Frames")]
+    private void StartSendingFrames()
+    {
+        if (_sendFrames)
+        {
+            Debug.LogWarning("Already sending frames.");
+            return;
+        }
+
+        _sendFrames = true;
+        _sendFramesCoroutine = StartCoroutine(SendFramesCoroutine());
+    }
+
+    [ContextMenu("Stop Sending Frames")]
+    private void StopSendingFrames()
+    {
+        if (!_sendFrames)
+        {
+            Debug.LogWarning("Not currently sending frames.");
+            return;
+        }
+
+        _sendFrames = false;
+        StopCoroutine(_sendFramesCoroutine);
+    }
+
     [ContextMenu("Start Server")]
     private void StartServer()
     {
@@ -78,5 +140,15 @@ public class Sender : MonoBehaviour
     {
         _mediaWebsocketClient.DisconnectFromServer();
         _mediaWebsocketServer.StopServer();
+    }
+
+    private IEnumerator SendFramesCoroutine()
+    {
+        while (_sendFrames)
+        {
+            SendFrame();
+            yield return new WaitForSeconds(1.0f / streamSettings.FrameRate);
+            Debug.Log($"Sent frame at {Time.time} seconds. {1 / streamSettings.FrameRate}");
+        }
     }
 }
