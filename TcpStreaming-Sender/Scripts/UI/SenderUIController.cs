@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using static StreamSettings;
 
 [System.Serializable]
 public class StreamSettings
@@ -11,13 +12,56 @@ public class StreamSettings
 
     public int FrameRate;
 
-    public int ColorDepth;
+    public enum ColorDepthEnum
+    {
+        ARGB32,
+        ARGB64,
+        RGB565,
+        R8
+    }
+    public ColorDepthEnum ColorDepth;
 
     public float Delay;
 
     public float BitRate;
 
     public int Codec;
+
+    public RenderTextureFormat GetRenderTextureFormat()
+    {
+        switch (ColorDepth)
+        {
+            case ColorDepthEnum.ARGB32:
+                return RenderTextureFormat.ARGB32;
+            case ColorDepthEnum.ARGB64:
+                return RenderTextureFormat.ARGB64;
+            case ColorDepthEnum.RGB565:
+                return RenderTextureFormat.RGB565;
+            case ColorDepthEnum.R8:
+                return RenderTextureFormat.R8;
+            default:
+                Debug.LogError("Invalid Color Depth selected. Defaulting to ARGB32.");
+                return RenderTextureFormat.ARGB32;
+        }
+    }
+
+    public TextureFormat GetTextureFormat()
+    {
+        switch (ColorDepth)
+        {
+            case ColorDepthEnum.ARGB32:
+                return TextureFormat.ARGB32;
+            case ColorDepthEnum.ARGB64:
+                return TextureFormat.RGBA64;
+            case ColorDepthEnum.RGB565:
+                return TextureFormat.RGB565;
+            case ColorDepthEnum.R8:
+                return TextureFormat.R8;
+            default:
+                Debug.LogError("Invalid Color Depth selected. Defaulting to ARGB32.");
+                return TextureFormat.ARGB32;
+        }
+    }
 
     public override string ToString()
     {
@@ -176,7 +220,7 @@ public class SenderUIController : MonoBehaviour
             Debug.LogError("Invalid Fps");
         }
 
-        int colorDepth = GetColorDepth();
+        ColorDepthEnum colorDepth = GetColorDepth();
         if (fps == -1)
         {
             Debug.LogError("Invalid Color Depth");
@@ -228,16 +272,24 @@ public class SenderUIController : MonoBehaviour
         return Vector2.zero;
     }
 
-    private int GetColorDepth()
+    private ColorDepthEnum GetColorDepth()
     {
         switch (_colorDepth.value)
         {
             case 0:
-            case 1:
-                return _colorDepth.value;
-        }
+                return ColorDepthEnum.ARGB32;
 
-        return -1;
+            case 1:
+                return ColorDepthEnum.ARGB64;
+            case 2:
+                return ColorDepthEnum.RGB565;
+            case 3:
+                return ColorDepthEnum.R8;
+            default:
+                Debug.LogError("Invalid Color Depth selected. Switched to ARGB32");
+                return ColorDepthEnum.ARGB32;
+
+        }
     }
 
     private int GetCodec()

@@ -1472,7 +1472,11 @@ MonoBehaviour:
     m_Options:
     - m_Text: ARGB32
       m_Image: {fileID: 0}
-    - m_Text: ARGB16
+    - m_Text: ARGB64
+      m_Image: {fileID: 0}
+    - m_Text: RGB565
+      m_Image: {fileID: 0}
+    - m_Text: "R8 (\u043E\u0434\u0438\u043D \u0446\u0432\u0435\u0442)"
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
@@ -3365,6 +3369,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d267422cf129d6409d8027ca0e07407, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _sender: {fileID: 0}
+  _updateCheckWaitTime: 0.5
   _canvasGameObject: {fileID: 115194953847855791}
   _statusGameObject: {fileID: 6576519807429419728}
   _translationOff: {fileID: 4108741766019237136}
@@ -3389,8 +3395,6 @@ MonoBehaviour:
   _controlButtonsGameObject: {fileID: 6349014085971496950}
   _startStreamButton: {fileID: 8164239544746640941}
   _endStreamButton: {fileID: 8629570486834821180}
-  _server: {fileID: 0}
-  _updateCheckWaitTime: 0.5
 --- !u!1 &4139735747519677710
 GameObject:
   m_ObjectHideFlags: 0

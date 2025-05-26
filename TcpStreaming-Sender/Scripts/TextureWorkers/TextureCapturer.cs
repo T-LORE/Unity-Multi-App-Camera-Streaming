@@ -31,11 +31,11 @@ public class TextureCapturer
         int targetHeight = _streamSettings.ResY;
 
 
-        _renderTexture = new RenderTexture(targetWidth, targetHeight, 24, RenderTextureFormat.ARGB32);
+        _renderTexture = new RenderTexture(targetWidth, targetHeight, 24, _streamSettings.GetRenderTextureFormat());
         _renderTexture.name = $"CaptureRenderTexture_{targetWidth}x{targetHeight}";
         _renderTexture.Create();
 
-        _capturedTexture2D = new Texture2D(targetWidth, targetHeight, TextureFormat.ARGB32, false);
+        _capturedTexture2D = new Texture2D(targetWidth, targetHeight, _streamSettings.GetTextureFormat(), false);
         _capturedTexture2D.name = $"CapturedTexture2D_{targetWidth}x{targetHeight}";
 
         _captureRect = new Rect(0, 0, targetWidth, targetHeight);
