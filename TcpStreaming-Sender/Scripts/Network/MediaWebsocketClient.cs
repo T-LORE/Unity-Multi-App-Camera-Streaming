@@ -114,9 +114,10 @@ public class MediaWebsocketClient : MonoBehaviour
    
     public void SendString(string message)
     {
-        if (_ws != null && _ws.IsAlive)
+        if (_ws == null || !_ws.IsAlive)
         {
             Debug.LogWarning("Can't send string - WebSocket is not connected.");
+            return;
         }
 
         _ws.Send(message);
@@ -126,21 +127,21 @@ public class MediaWebsocketClient : MonoBehaviour
     private void OnOpenConnection(object sender, System.EventArgs e)
     {
         Debug.Log("WebSocket connection opened successfully.");
-        OnOpenAction?.Invoke();
+        MainThreadDispatcher.Enqueue(() => OnOpenAction?.Invoke());
     }
 
     private void OnRecieveMessage(object sender, MessageEventArgs e)
     {
         if (e.IsBinary)
         {
-            Debug.LogWarning("Received binary data, which is not supported in this client.");
+            Debug.Log("Binary data");
 
         }
         else
         {
             Debug.Log($"Received message: {e.Data}");
         }
-        OnMessageAction?.Invoke(e);
+        MainThreadDispatcher.Enqueue(() => OnMessageAction(e));
     }
 
     private void OnRecieveError(object sender, ErrorEventArgs e)
@@ -150,14 +151,14 @@ public class MediaWebsocketClient : MonoBehaviour
         {
             Debug.LogError($"WebSocket Exception: {e.Exception}");
         }
-        OnErrorAction?.Invoke(e);
+        MainThreadDispatcher.Enqueue(() => OnErrorAction?.Invoke(e));
     }
 
     private void OnCloseConenction(object sender, CloseEventArgs e)
     {
         Debug.Log($"WebSocket connection closed. Code: {e.Code}, Reason: {e.Reason}");
         _ws = null;
-        OnCloseAction?.Invoke(e);
+        MainThreadDispatcher.Enqueue(() => OnCloseAction?.Invoke(e));
     }
 
     [ContextMenu("Test connect receiver")]

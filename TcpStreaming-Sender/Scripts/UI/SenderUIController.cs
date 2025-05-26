@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public struct StreamSettings
+[System.Serializable]
+public class StreamSettings
 {
     public int ResX;
     public int ResY;
