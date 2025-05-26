@@ -33,7 +33,7 @@ public class MainThreadDispatcher : MonoBehaviour
         {
             try
             {
-                action.Invoke();
+                action?.Invoke();
             }
             catch (Exception e)
             {

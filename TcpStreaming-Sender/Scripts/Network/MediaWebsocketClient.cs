@@ -13,8 +13,37 @@ public class MediaWebsocketClient : MonoBehaviour
 
     private WebSocket _ws;
     private string _ip;
+    public string IP
+    {
+        get { return _ip; }
+    }
     private string _port;
+    public string Port
+    {
+        get { return _port; }
+    }
     private string _service;
+    public enum ClientStatus
+    {
+        Disconnected,
+        Connecting,
+        Connected
+    }
+    private ClientStatus _status;
+    public ClientStatus Status
+    {
+        get { return _status; }
+        private set
+        {
+            _status = value;
+            Debug.Log($"WebSocket client status changed to: {_status}");
+        }
+    }
+
+    private void Start()
+    {
+        Status = ClientStatus.Disconnected;
+    }
 
     public bool ConnectToServer(string ip, string port, string service)
     {
@@ -30,6 +59,7 @@ public class MediaWebsocketClient : MonoBehaviour
 
         string url = $"ws://{_ip}:{_port}/{_service}";
         Debug.Log($"Attempting to connect to WebSocket server at {url}");
+        Status = ClientStatus.Connecting;
         _ws = new WebSocket(url);
 
         _ws.OnOpen += OnOpenConnection;
@@ -109,7 +139,7 @@ public class MediaWebsocketClient : MonoBehaviour
         }
 
         _ws.Send(data);
-        Debug.Log($"Sent {data.Length} bytes.");
+        //Debug.Log($"Sent {data.Length} bytes.");
     }
    
     public void SendString(string message)
@@ -127,6 +157,7 @@ public class MediaWebsocketClient : MonoBehaviour
     private void OnOpenConnection(object sender, System.EventArgs e)
     {
         Debug.Log("WebSocket connection opened successfully.");
+        Status = ClientStatus.Connected;
         MainThreadDispatcher.Enqueue(() => OnOpenAction?.Invoke());
     }
 
@@ -134,7 +165,7 @@ public class MediaWebsocketClient : MonoBehaviour
     {
         if (e.IsBinary)
         {
-            Debug.Log("Binary data");
+            //Debug.Log("Binary data");
 
         }
         else
@@ -158,6 +189,7 @@ public class MediaWebsocketClient : MonoBehaviour
     {
         Debug.Log($"WebSocket connection closed. Code: {e.Code}, Reason: {e.Reason}");
         _ws = null;
+        Status = ClientStatus.Disconnected;
         MainThreadDispatcher.Enqueue(() => OnCloseAction?.Invoke(e));
     }
 

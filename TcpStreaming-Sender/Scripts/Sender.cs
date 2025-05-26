@@ -92,7 +92,6 @@ public class Sender : MonoBehaviour
             {
                 _displayImage.texture = decodedTextureForDisplay;
             }
-             _displayImage.SetNativeSize();
         }
         else
         {
@@ -101,7 +100,7 @@ public class Sender : MonoBehaviour
     }
 
     [ContextMenu("Start Sending Frames")]
-    private void StartSendingFrames()
+    public void StartSendingFrames()
     {
         if (_sendFrames)
         {
@@ -110,11 +109,12 @@ public class Sender : MonoBehaviour
         }
 
         _sendFrames = true;
+        StartServer();
         _sendFramesCoroutine = StartCoroutine(SendFramesCoroutine());
     }
 
     [ContextMenu("Stop Sending Frames")]
-    private void StopSendingFrames()
+    public void StopSendingFrames()
     {
         if (!_sendFrames)
         {
@@ -123,7 +123,30 @@ public class Sender : MonoBehaviour
         }
 
         _sendFrames = false;
+        StopServer();
         StopCoroutine(_sendFramesCoroutine);
+    }
+
+    public string GetIP()
+    {
+        if (!_sendFrames)
+        {
+            Debug.LogError("Can't get ip: not currently sending frames.");
+            return "ERROR";
+        }
+
+        return AddressConfigurator.GetLocalIP();
+    }
+
+    public string GetPort()
+    {
+        if (!_sendFrames)
+        {
+            Debug.LogError("Can't get port: not currently sending frames.");
+            return "ERROR";
+        }
+
+        return AddressConfigurator.GetLocalPort();
     }
 
     [ContextMenu("Start Server")]
@@ -148,7 +171,7 @@ public class Sender : MonoBehaviour
         {
             SendFrame();
             yield return new WaitForSeconds(1.0f / streamSettings.FrameRate);
-            Debug.Log($"Sent frame at {Time.time} seconds. {1 / streamSettings.FrameRate}");
+            //Debug.Log($"Sent frame at {Time.time} seconds. {1 / streamSettings.FrameRate}");
         }
     }
 }

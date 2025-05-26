@@ -32,6 +32,11 @@ public class StreamSettings
 
 public class SenderUIController : MonoBehaviour
 {
+
+    [Header("Server")]
+    [SerializeField] private Sender _sender;
+    [SerializeField] private float _updateCheckWaitTime;
+
     [SerializeField] private GameObject _canvasGameObject;
 
     [Header("Stream Status")]
@@ -71,10 +76,6 @@ public class SenderUIController : MonoBehaviour
     [SerializeField] private Button _startStreamButton;
     [SerializeField] private Button _endStreamButton;
 
-    [Header("Server")]
-    [SerializeField] private TextureSenderServer _server;
-    [SerializeField] private float _updateCheckWaitTime; 
-
     private StreamSettings _streamSettings;
     private float _serverStartTime;
 
@@ -101,7 +102,7 @@ public class SenderUIController : MonoBehaviour
 
     private void StartStreamButtonClicked()
     {
-        _server.StartConnection();
+        _sender.StartSendingFrames();
         _serverStartTime = Time.time;
         StartCoroutine(_updateServerInfoCoroutine);
 
@@ -121,7 +122,7 @@ public class SenderUIController : MonoBehaviour
 
     private void StopStreamButtonClicked()
     {
-        _server.StopConnection();
+        _sender.StopSendingFrames();
         StopCoroutine(_updateServerInfoCoroutine);
 
         _infoGameObject.SetActive(false);
@@ -140,7 +141,7 @@ public class SenderUIController : MonoBehaviour
     {
         while (true)
         {
-            _IPValue.text = $"{_server.listenIp}:{_server.port}";
+            _IPValue.text = $"{_sender.GetIP()}:{_sender.GetPort()}";
             _timerValue.text = $"{(int)(Time.time - _serverStartTime) / 3600:D2}:{(int)(Time.time - _serverStartTime) / 60 % 60:D2}:{(int)(Time.time - _serverStartTime) % 60:D2}";
             _currentBitrateValue.text = $"NaN";
             yield return new WaitForSeconds(_updateCheckWaitTime);
@@ -198,6 +199,8 @@ public class SenderUIController : MonoBehaviour
         streamSettings.Codec = codec;
 
         _streamSettings = streamSettings;
+
+        _sender.UpdateSettings(streamSettings);
     }
     
     private int GetFrameRate()

@@ -17,10 +17,9 @@ public class BroadcastSenderBehavior : WebSocketBehavior
     {
         try
         {
-            // Логируем, что получили и какие данные
             string dataType = e.IsText ? "Text" : (e.IsBinary ? "Binary" : "Unknown");
             string dataPreview = e.IsText ? e.Data : (e.IsBinary ? $"Binary data, Length: {e.RawData.Length}" : "N/A");
-            Debug.Log($"[BroadcastSender] Received message. Type: {dataType}. Preview: '{dataPreview}'. Attempting to broadcast...");
+            //Debug.Log($"[BroadcastSender] Received message. Type: {dataType}. Preview: '{dataPreview}'. Attempting to broadcast...");
 
             if (MediaWebsocketServer.Instance == null)
             {
@@ -51,7 +50,7 @@ public class BroadcastSenderBehavior : WebSocketBehavior
                     return;
                 }
 
-                Debug.Log($"[BroadcastSender] Found {nameof(BroadcastReceiveBehavior)} service. Number of connected receivers: {receiveServiceHost.Sessions.Count}. Broadcasting now...");
+                //Debug.Log($"[BroadcastSender] Found {nameof(BroadcastReceiveBehavior)} service. Number of connected receivers: {receiveServiceHost.Sessions.Count}. Broadcasting now...");
 
                 if (e.IsText)
                 {
@@ -59,7 +58,7 @@ public class BroadcastSenderBehavior : WebSocketBehavior
                 }
                 else if (e.IsBinary)
                 {
-                    // Убедимся, что e.RawData не null, хотя это маловероятно, если e.IsBinary true
+                    
                     if (e.RawData != null)
                     {
                         receiveServiceHost.Sessions.Broadcast(e.RawData);
@@ -73,7 +72,7 @@ public class BroadcastSenderBehavior : WebSocketBehavior
                 {
                     Debug.LogWarning("[BroadcastSender] Message type is neither Text nor Binary. Cannot determine how to broadcast.");
                 }
-                Debug.Log("[BroadcastSender] Broadcast call completed.");
+                //Debug.Log("[BroadcastSender] Broadcast call completed.");
             }
             else
             {
@@ -83,7 +82,7 @@ public class BroadcastSenderBehavior : WebSocketBehavior
                 {
                     availablePaths += path + " | ";
                 }
-                Debug.Log(availablePaths);
+                //Debug.Log(availablePaths);
             }
         }
         catch (Exception ex)

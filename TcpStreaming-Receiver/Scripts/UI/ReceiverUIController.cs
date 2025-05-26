@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class ReceiverUIController : MonoBehaviour
 {
     [Header("Receiver")]
-    [SerializeField] private TextureReceiver _receiver;
+    [SerializeField] private Receiver _receiver;
 
     [Header("Canvas")]
     [SerializeField] private GameObject _canvasGameObject;
@@ -70,7 +70,7 @@ public class ReceiverUIController : MonoBehaviour
 
         if (_currentPanel == Panel.ConnectionProgress)
         {
-            if (_receiver._isConnected)
+            if (_receiver.Status == MediaWebsocketClient.ClientStatus.Connected)
             {
                 SwitchUIPanelTo(Panel.Connected);
             }
@@ -78,7 +78,7 @@ public class ReceiverUIController : MonoBehaviour
 
         if (_receiver != null && _currentPanel == Panel.Connected)
         {
-            _video.texture = _receiver.receivedTexture;
+            _video.texture = _receiver.ReceivedTexture;
         }
     }
 
@@ -173,18 +173,6 @@ public class ReceiverUIController : MonoBehaviour
         }
     }
 
-    private void UpdateStreamAddress()
-    {
-        Debug.Log($"Update stream address: {_IP.text}:{_port.text}");
-        ReceiverSettings settings = new ReceiverSettings
-        {
-            ServerIP = _IP.text.Trim(),
-            ServerPort = ushort.Parse(_port.text.Trim())
-        };
-
-        _receiver.SetSettings(settings);
-    }
-
     private List<ValidationError> ValidateAddress()
     {
         string ip = _IP.text.Trim();
@@ -216,11 +204,12 @@ public class ReceiverUIController : MonoBehaviour
             return;
         }
 
-        _receiver.Connect();
-        _IPPortValue.text = $"{_receiver.serverIp}:{_receiver.serverPort}";
+        string ip = _IP.text.Trim();
+        int port = ushort.Parse(_port.text.Trim());
+        _receiver.Connect(ip, port);
+        _IPPortValue.text = $"{_receiver.GetConnectedIP()}:{_receiver.GetConnectedPort()}";
 
         SwitchUIPanelTo(Panel.ConnectionProgress);
-        UpdateStreamAddress();
     }
 
     private void DisconnectButtonClicked()
