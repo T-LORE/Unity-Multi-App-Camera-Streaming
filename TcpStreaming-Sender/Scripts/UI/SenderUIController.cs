@@ -25,7 +25,13 @@ public class StreamSettings
 
     public float BitRate;
 
-    public int Codec;
+    public enum CodecEnum
+    {
+        MJPG,
+        MGP
+    }
+
+    public CodecEnum Codec;
 
     public RenderTextureFormat GetRenderTextureFormat()
     {
@@ -229,10 +235,7 @@ public class SenderUIController : MonoBehaviour
         float delay = _delay.value;
         float bitrate = _bitrate.value;
 
-        int codec = GetCodec();
-        if (codec == -1) {
-            Debug.LogError("Invalid Codec");
-        }
+        CodecEnum codec = GetCodec();
 
         streamSettings.ResX = (int)res.x;
         streamSettings.ResY = (int)res.y;
@@ -292,16 +295,18 @@ public class SenderUIController : MonoBehaviour
         }
     }
 
-    private int GetCodec()
+    private CodecEnum GetCodec()
     {
         switch (_codec.value)
         {
             case 0:
+                return CodecEnum.MJPG;
             case 1:
-                return _codec.value;
+                return CodecEnum.MGP;
+            default:
+                Debug.LogError("Invalid Codec selected. Switched to MJPG");
+                return CodecEnum.MJPG;
         }
-
-        return -1;
     }
 
 

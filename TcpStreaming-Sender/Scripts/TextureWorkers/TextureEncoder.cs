@@ -14,7 +14,22 @@ public class TextureEncoder
 
     public byte[] EncodeFrame(Texture2D texture, TextureCapturer textureCapturer)
     {
-        byte[] dataBytes = texture.EncodeToJPG(80);
+        byte[] dataBytes;
+
+        switch (_streamSettings.Codec)
+        {
+            case StreamSettings.CodecEnum.MJPG:
+                dataBytes = texture.EncodeToJPG(80);
+                break;
+            case StreamSettings.CodecEnum.MGP:
+                dataBytes = texture.EncodeToPNG();
+                break;
+            default:
+                Debug.LogError("Invalid Codec selected. Defaulting to MJPG.");
+                dataBytes = texture.EncodeToJPG(80);
+                break;
+        }
+
         return dataBytes;
     }
 
