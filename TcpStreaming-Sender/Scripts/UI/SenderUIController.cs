@@ -15,7 +15,6 @@ public class StreamSettings
     public enum ColorDepthEnum
     {
         ARGB32,
-        ARGB64,
         RGB565,
         R8
     }
@@ -39,8 +38,6 @@ public class StreamSettings
         {
             case ColorDepthEnum.ARGB32:
                 return RenderTextureFormat.ARGB32;
-            case ColorDepthEnum.ARGB64:
-                return RenderTextureFormat.ARGB64;
             case ColorDepthEnum.RGB565:
                 return RenderTextureFormat.RGB565;
             case ColorDepthEnum.R8:
@@ -57,8 +54,6 @@ public class StreamSettings
         {
             case ColorDepthEnum.ARGB32:
                 return TextureFormat.ARGB32;
-            case ColorDepthEnum.ARGB64:
-                return TextureFormat.RGBA64;
             case ColorDepthEnum.RGB565:
                 return TextureFormat.RGB565;
             case ColorDepthEnum.R8:
@@ -281,9 +276,6 @@ public class SenderUIController : MonoBehaviour
         {
             case 0:
                 return ColorDepthEnum.ARGB32;
-
-            case 1:
-                return ColorDepthEnum.ARGB64;
             case 2:
                 return ColorDepthEnum.RGB565;
             case 3:
