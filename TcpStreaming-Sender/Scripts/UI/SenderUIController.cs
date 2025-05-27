@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.UI;
 using UnityEngine;
 using UnityEngine.UI;
 using static StreamSettings;
@@ -21,8 +22,6 @@ public class StreamSettings
     public ColorDepthEnum ColorDepth;
 
     public float Delay;
-
-    public float BitRate;
 
     public enum CodecEnum
     {
@@ -70,7 +69,6 @@ public class StreamSettings
                $"FrameRate: {FrameRate} FPS, " +
                $"ColorDepth: {ColorDepth}, " +
                $"Delay: {Delay} s, " +
-               $"BitRate: {BitRate} Kbps, " +
                $"Codec: {Codec}";
     }
 }
@@ -111,6 +109,7 @@ public class SenderUIController : MonoBehaviour
     [SerializeField] private Text _bitrateStartLabel;
     [SerializeField] private Text _bitrateEndLabel;
     [SerializeField] private Text _bitrateCurrentLabel;
+    [SerializeField] private Toggle _usePresetsWithBitrate;
 
     [SerializeField] private Dropdown _codec;
 
@@ -131,8 +130,9 @@ public class SenderUIController : MonoBehaviour
         _updateServerInfoCoroutine = UpdateServerInfo();
 
         ConfigureSlider(_delay, _delayStartLabel, _delayEndLabel, _delayCurrentLabel);
-        ConfigureSlider(_bitrate, _bitrateStartLabel, _bitrateEndLabel, _bitrateCurrentLabel);
+        ConfigureBitrate();
 
+        _usePresetsWithBitrate.onValueChanged.AddListener(y => OnPresetsWithBitrateToggle());
         _startStreamButton.onClick.AddListener(StartStreamButtonClicked);
         _endStreamButton.onClick.AddListener(StopStreamButtonClicked);
     }
@@ -142,6 +142,28 @@ public class SenderUIController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Tab))
         {
             _canvasGameObject.SetActive(!_canvasGameObject.activeSelf);
+        }
+    }
+
+    private void OnPresetsWithBitrateToggle()
+    {
+        if (_usePresetsWithBitrate.isOn)
+        {
+            _bitrate.interactable = true;
+
+            _resolution.interactable = false;
+            _colorDepth.interactable = false;
+            _codec.interactable = false;
+            _frameRate.interactable = false;
+        }
+        else
+        {
+            _bitrate.interactable = false;
+
+            _resolution.interactable = true;
+            _colorDepth.interactable = true;
+            _codec.interactable = true;
+            _frameRate.interactable = true;
         }
     }
 
@@ -201,6 +223,80 @@ public class SenderUIController : MonoBehaviour
         slider.onValueChanged.AddListener(delegate { SliderUpdate(slider, curValLabel); });
     }
 
+    private void ConfigureBitrate()
+    {
+        
+        _bitrateStartLabel.text = "Низкий";
+        _bitrateEndLabel.text = "Высокий";
+        BitrateSliderUpdate();
+        _bitrate.onValueChanged.AddListener(f => BitrateSliderUpdate());
+    }
+
+    private void BitrateSliderUpdate()
+    {
+        switch (_bitrate.value)
+        {
+            case 1:
+                _bitrateCurrentLabel.text = "100 Кб/С";
+                break;
+            case 2:
+                _bitrateCurrentLabel.text = "500 Кб/С";
+                break;
+            case 3:
+                _bitrateCurrentLabel.text = "1000 Кб/С";
+                break;
+            default:
+                _bitrateCurrentLabel.text = "Неизвестно";
+                break;
+        }
+    }
+
+    private StreamSettings GetBitratePreset()
+    {
+        switch (_bitrate.value)
+        {
+            case 1: //100 Kbps
+                return new StreamSettings { 
+                    ResX = 640,
+                    ResY = 480,
+                    FrameRate = 30,
+                    ColorDepth = ColorDepthEnum.RGB565,
+                    Delay = _delay.value,
+                    Codec = CodecEnum.MJPG
+                    };
+                case 2: //500 Kbps
+                return new StreamSettings
+                {
+                    ResX = 1280,
+                    ResY = 720,
+                    FrameRate = 30,
+                    ColorDepth = ColorDepthEnum.RGB565,
+                    Delay = _delay.value,
+                    Codec = CodecEnum.MJPG
+                };
+                case 3: //1000 Kbps
+                return new StreamSettings
+                {
+                    ResX = 1920,
+                    ResY = 1080,
+                    FrameRate = 60,
+                    ColorDepth = ColorDepthEnum.ARGB32,
+                    Delay = _delay.value,
+                    Codec = CodecEnum.MGP
+                };
+                default:
+                return new StreamSettings
+                {
+                    ResX = 1920,
+                    ResY = 1080,
+                    FrameRate = 30,
+                    ColorDepth = ColorDepthEnum.ARGB32,
+                    Delay = _delay.value,
+                    Codec = CodecEnum.MJPG
+                };
+        }
+    }
+
     private void SliderUpdate(Slider slider, Text curValLabel)
     {
         float val = slider.value;
@@ -209,6 +305,12 @@ public class SenderUIController : MonoBehaviour
 
     private void UpdateStreamSettings()
     {
+        if (_usePresetsWithBitrate.isOn)
+        {
+            _sender.UpdateSettings(GetBitratePreset());
+            return;
+        }
+
         StreamSettings streamSettings = new StreamSettings();
         Vector2 res = GetResolution();
         if (res == Vector2.zero) {
@@ -228,7 +330,6 @@ public class SenderUIController : MonoBehaviour
         }
 
         float delay = _delay.value;
-        float bitrate = _bitrate.value;
 
         CodecEnum codec = GetCodec();
 
@@ -237,7 +338,6 @@ public class SenderUIController : MonoBehaviour
         streamSettings.FrameRate = fps;
         streamSettings.ColorDepth = colorDepth;
         streamSettings.Delay = delay;
-        streamSettings.BitRate = bitrate;
         streamSettings.Codec = codec;
 
         _streamSettings = streamSettings;
