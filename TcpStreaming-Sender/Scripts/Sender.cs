@@ -20,6 +20,9 @@ public class Sender : MonoBehaviour
     [SerializeField]
     private MediaWebsocketClient _mediaWebsocketClient;
 
+    [SerializeField]
+    private Texture2D _delayJpgPic;
+
     private TextureCapturer _textureCapturer;
 
     private TextureEncoder _textureEncoder;
@@ -32,16 +35,25 @@ public class Sender : MonoBehaviour
 
     private Coroutine _sendFramesCoroutine;
 
+    private FramesQueue _framesQueue;
+
+    private float _streamStartTime;
+    public float StreamStartTime
+    {
+        get { return _streamStartTime; }
+    }
+
     private void Start()
     {
         _textureCapturer = new TextureCapturer(_targetCamera, streamSettings);
         _textureEncoder = new TextureEncoder(streamSettings);
         _frameDecoder = new FrameDecoder(new Vector2(2,2));
+        _framesQueue = new FramesQueue();
 
     }
 
     [ContextMenu("update settings")]
-    private void UpdateSettings()
+    private void TestUpdateSettings()
     {
         UpdateSettings(streamSettings);
     }
@@ -72,18 +84,17 @@ public class Sender : MonoBehaviour
 
 
     [ContextMenu("Send Frame")]
-    private void SendFrame()
+    private void SendFrame(Frame frame)
     {
-        var texture = _textureCapturer.CaptureFrame();
-        var encodedTexture = _textureEncoder.EncodeFrame(texture, _textureCapturer);
-        _mediaWebsocketClient.SendBytes(encodedTexture);
+        _mediaWebsocketClient.SendBytes(frame.Data);
 
         if (_displayImage == null)
         {
             return;
         }
+
         //Debug
-        Texture2D decodedTextureForDisplay = _frameDecoder.DecodeFrameData(encodedTexture);
+        Texture2D decodedTextureForDisplay = _frameDecoder.DecodeFrameData(frame.Data);
 
         if (decodedTextureForDisplay != null)
         {
@@ -99,6 +110,13 @@ public class Sender : MonoBehaviour
         }
     }
 
+    private Frame PrepareFrame()
+    {
+        var texture = _textureCapturer.CaptureFrame();
+        var encodedTexture = _textureEncoder.EncodeFrame(texture, _textureCapturer);
+        return new Frame(Time.time, encodedTexture);
+    }
+
     [ContextMenu("Start Sending Frames")]
     public void StartSendingFrames()
     {
@@ -108,6 +126,7 @@ public class Sender : MonoBehaviour
             return;
         }
 
+        _streamStartTime = Time.time;
         _sendFrames = true;
         StartServer();
         _sendFramesCoroutine = StartCoroutine(SendFramesCoroutine());
@@ -125,6 +144,7 @@ public class Sender : MonoBehaviour
         _sendFrames = false;
         StopServer();
         StopCoroutine(_sendFramesCoroutine);
+        _framesQueue.Clear();
     }
 
     public string GetIP()
@@ -167,9 +187,32 @@ public class Sender : MonoBehaviour
 
     private IEnumerator SendFramesCoroutine()
     {
+        if (streamSettings.Delay > 0.2)
+        {
+            Frame delayFrame = new Frame(Time.time, _delayJpgPic.EncodeToJPG(100));
+            while (Time.time - _streamStartTime < streamSettings.Delay)
+            {
+                SendFrame(delayFrame);
+                yield return new WaitForSeconds(0.1f);
+            }
+        }
+
+        Frame nextFrame = null;
+
         while (_sendFrames)
         {
-            SendFrame();
+            _framesQueue.Enqueue(PrepareFrame());
+
+            if (nextFrame == null)
+            {
+                nextFrame = _framesQueue.Dequeue();
+            }
+
+            if (Time.time - nextFrame.Time >= streamSettings.Delay)
+            {
+                SendFrame(nextFrame);
+                nextFrame = null;
+            }
             yield return new WaitForSeconds(1.0f / streamSettings.FrameRate);
             //Debug.Log($"Sent frame at {Time.time} seconds. {1 / streamSettings.FrameRate}");
         }
