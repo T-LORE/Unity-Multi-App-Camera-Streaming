@@ -146,11 +146,11 @@ public class SenderUIController : MonoBehaviour
 
     private void StartStreamButtonClicked()
     {
+        UpdateStreamSettings();
         _sender.StartSendingFrames();
         _serverStartTime = Time.time;
         StartCoroutine(_updateServerInfoCoroutine);
 
-        UpdateStreamSettings();
         _settingsGameObject.SetActive(false);
         _infoGameObject.SetActive(true);
 
