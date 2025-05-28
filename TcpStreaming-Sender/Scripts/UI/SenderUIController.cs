@@ -376,9 +376,9 @@ public class SenderUIController : MonoBehaviour
         {
             case 0:
                 return ColorDepthEnum.ARGB32;
-            case 2:
+            case 1:
                 return ColorDepthEnum.RGB565;
-            case 3:
+            case 2:
                 return ColorDepthEnum.R8;
             default:
                 Debug.LogError("Invalid Color Depth selected. Switched to ARGB32");
