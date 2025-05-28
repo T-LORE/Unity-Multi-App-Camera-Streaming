@@ -27,7 +27,7 @@ public class MediaWebsocketClient : MonoBehaviour
     {
         Disconnected,
         Connecting,
-        Connected
+        Connected,
     }
     private ClientStatus _status;
     public ClientStatus Status
@@ -46,6 +46,13 @@ public class MediaWebsocketClient : MonoBehaviour
     {
         Status = ClientStatus.Disconnected;
         byteLogger = new ByteLogger();
+        OnMessageAction += (e) =>
+        {
+            if (e.IsBinary)
+            {
+                byteLogger.AddBytePacket(e.RawData.Length);
+            }
+        };
     }
 
     public bool ConnectToServer(string ip, string port, string service)
@@ -170,7 +177,6 @@ public class MediaWebsocketClient : MonoBehaviour
         if (e.IsBinary)
         {
             //Debug.Log("Binary data");
-            byteLogger.AddBytePacket(e.RawData.Length);
         }
         else
         {
@@ -181,7 +187,7 @@ public class MediaWebsocketClient : MonoBehaviour
 
     private void OnRecieveError(object sender, ErrorEventArgs e)
     {
-        Debug.LogError($"WebSocket Error: {e.Message}");
+        
         if (e.Exception != null)
         {
             Debug.LogError($"WebSocket Exception: {e.Exception}");
@@ -191,7 +197,7 @@ public class MediaWebsocketClient : MonoBehaviour
 
     private void OnCloseConenction(object sender, CloseEventArgs e)
     {
-        Debug.Log($"WebSocket connection closed. Code: {e.Code}, Reason: {e.Reason}");
+        Debug.Log($"WebSocket connection closed. Code: {e.Code}, Reason: {e.Reason}, WasClean: {e.WasClean}");
         _ws = null;
         byteLogger.Clear();
         Status = ClientStatus.Disconnected;

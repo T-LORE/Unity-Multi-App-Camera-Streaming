@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 using WebSocketSharp;
 
@@ -15,6 +16,10 @@ public class Receiver : MonoBehaviour
     private FrameDecoder _frameDecoder;
 
     private Texture2D _receivedTexture;
+
+    public UnityAction OnConnectionError;
+
+    public UnityAction<CloseEventArgs> OnDisconnect;
 
     public Texture2D ReceivedTexture
     {
@@ -42,6 +47,18 @@ public class Receiver : MonoBehaviour
 
         _mediaWebsocketClient.OnMessageAction += FrameRecieved;
         _frameDecoder = new FrameDecoder(new Vector2(_displayImage.uvRect.width, _displayImage.uvRect.height));
+
+        _mediaWebsocketClient.OnErrorAction += (e) =>
+        {
+            OnConnectionError?.Invoke();
+        };
+
+        _mediaWebsocketClient.OnCloseAction += (e) =>
+        {
+            OnDisconnect?.Invoke(e);
+        };
+
+
     }
 
     public void Connect(string ip, int port)
