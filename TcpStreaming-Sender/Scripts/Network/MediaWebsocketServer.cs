@@ -22,20 +22,39 @@ public class MediaWebsocketServer : MonoBehaviour
         }
     }
 
-    public void StartServer(string ip, string port)
+    public bool StartServer(string ip, string port)
     {
         if (_webSocketServer != null && _webSocketServer.IsListening)
         {
             Debug.LogWarning("Server is already running.");
-            return;
+            return false;
         }
-
-        _webSocketServer = new WebSocketServer($"ws://{ip}:{port}");
+        try
+        {
+            Debug.Log($"Trying to create server on: ws://{ip}:{port}");
+            _webSocketServer = new WebSocketServer($"ws://{ip}:{port}");
+        } catch (System.Exception ex)
+        {
+            Debug.LogError($"Error when creating server: {ex.Message}");
+            _webSocketServer = null;
+            return false;
+        }
 
         _webSocketServer.AddWebSocketService<BroadcastSenderBehavior>($"/{nameof(BroadcastSenderBehavior)}");
         _webSocketServer.AddWebSocketService<BroadcastReceiveBehavior>($"/{nameof(BroadcastReceiveBehavior)}");
 
-        _webSocketServer.Start();
+        try
+        {
+            Debug.Log($"Trying to start server on: ws://{ip}:{port}");
+
+            _webSocketServer.Start();
+        } catch (System.Exception ex)
+        {
+            Debug.LogError($"Error when starting server: {ex.Message}");
+            _webSocketServer = null;
+            return false;
+        }
+
 
         if (_webSocketServer.IsListening)
         {
@@ -46,7 +65,11 @@ public class MediaWebsocketServer : MonoBehaviour
         else
         {
             Debug.LogError("WebSocket server FAILED to start.");
+            _webSocketServer = null;
+            return false;
         }
+
+        return true;
     }
 
     public void StopServer()
