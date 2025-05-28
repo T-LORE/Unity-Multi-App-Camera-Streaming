@@ -1,29 +1,28 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Net;
+using System.Net.Sockets;
 using UnityEngine;
 
 public static class AddressConfigurator
 {
 
-    private static string localIP = "192.168.1.126";
+    private static string localIP = "127.0.0.1";
 
-    private static string localPort = "1672";
+    private static string localPort = "5555";
 
 
    public static string GetLocalIP()
    {
-        /*
-                 var host = Dns.GetHostEntry(Dns.GetHostName());
-        foreach (var ip in host.AddressList) {
-            if (ip.AddressFamily == AddressFamily.InterNetwork) {
-                serverIpv4Address = ip.ToString();
+        string ip = localIP;
+
+        var host = Dns.GetHostEntry(Dns.GetHostName());
+        foreach (var ips in host.AddressList) {
+            if (ips.AddressFamily == AddressFamily.InterNetwork) {
+                ip = ips.ToString();
                 break;
             }
         }
-        */
-
-        //TODO: dynamically get the local IP address
-        string ip = localIP;
 
         return ip;
    }
