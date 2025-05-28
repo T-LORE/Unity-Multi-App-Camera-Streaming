@@ -206,10 +206,12 @@ public class ReceiverUIController : MonoBehaviour
 
         string ip = _IP.text.Trim();
         int port = ushort.Parse(_port.text.Trim());
+
+        SwitchUIPanelTo(Panel.ConnectionProgress);
+
         _receiver.Connect(ip, port);
         _IPPortValue.text = $"{_receiver.GetConnectedIP()}:{_receiver.GetConnectedPort()}";
 
-        SwitchUIPanelTo(Panel.ConnectionProgress);
     }
 
     private void DisconnectButtonClicked()

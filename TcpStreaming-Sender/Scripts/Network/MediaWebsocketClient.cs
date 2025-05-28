@@ -99,7 +99,7 @@ public class MediaWebsocketClient : MonoBehaviour
     {
         try
         {
-            _ws.Connect();
+            _ws.ConnectAsync();
 
             return true;
         }

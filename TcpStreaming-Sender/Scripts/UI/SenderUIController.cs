@@ -170,7 +170,7 @@ public class SenderUIController : MonoBehaviour
     private void StartStreamButtonClicked()
     {
         UpdateStreamSettings();
-        _sender.StartSendingFrames();
+        
         _serverStartTime = Time.time;
         StartCoroutine(_updateServerInfoCoroutine);
 
@@ -183,6 +183,7 @@ public class SenderUIController : MonoBehaviour
         _translationOff.gameObject.SetActive(false);
         _translationOn.gameObject.SetActive(true);
 
+        _sender.StartSendingFrames();
         Debug.Log($"Start stream button clicked!");
         Debug.Log($"Stream settings: {_streamSettings}");
     }
