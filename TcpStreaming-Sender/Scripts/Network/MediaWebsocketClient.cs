@@ -40,9 +40,12 @@ public class MediaWebsocketClient : MonoBehaviour
         }
     }
 
+    public ByteLogger byteLogger { get; private set; }
+
     private void Start()
     {
         Status = ClientStatus.Disconnected;
+        byteLogger = new ByteLogger();
     }
 
     public bool ConnectToServer(string ip, string port, string service)
@@ -139,6 +142,7 @@ public class MediaWebsocketClient : MonoBehaviour
         }
 
         _ws.Send(data);
+        byteLogger.AddBytePacket(data.Length);
         //Debug.Log($"Sent {data.Length} bytes.");
     }
    
@@ -166,7 +170,7 @@ public class MediaWebsocketClient : MonoBehaviour
         if (e.IsBinary)
         {
             //Debug.Log("Binary data");
-
+            byteLogger.AddBytePacket(e.RawData.Length);
         }
         else
         {
@@ -189,6 +193,7 @@ public class MediaWebsocketClient : MonoBehaviour
     {
         Debug.Log($"WebSocket connection closed. Code: {e.Code}, Reason: {e.Reason}");
         _ws = null;
+        byteLogger.Clear();
         Status = ClientStatus.Disconnected;
         MainThreadDispatcher.Enqueue(() => OnCloseAction?.Invoke(e));
     }

@@ -86,6 +86,56 @@ public class MediaWebsocketServer : MonoBehaviour
         }
     }
 
+    public int GetConnectedReceiversCount()
+    {
+        if (_webSocketServer == null || !_webSocketServer.IsListening)
+        {
+            Debug.LogWarning("WebSocket server is not running.");
+            return 0;
+        }
+
+        var services = _webSocketServer.WebSocketServices;
+        if (services == null)
+        {
+            Debug.LogError("WebSocketServices collection is NULL. Cannot count connected receivers.");
+            return 0;
+        }
+
+        WebSocketServiceHost receiveServiceHost;
+        if (services.TryGetServiceHost($"/{nameof(BroadcastReceiveBehavior)}", out receiveServiceHost) && receiveServiceHost != null)
+        {
+            return receiveServiceHost.Sessions.Count;
+        }
+        
+        Debug.LogWarning($"No service host found for {nameof(BroadcastReceiveBehavior)}. Returning 0 connected receivers.");
+        return 0;
+    }
+
+    public int GetConnectedSendersCount()
+    {
+        if (_webSocketServer == null || !_webSocketServer.IsListening)
+        {
+            Debug.LogWarning("WebSocket server is not running.");
+            return 0;
+        }
+
+        var services = _webSocketServer.WebSocketServices;
+        if (services == null)
+        {
+            Debug.LogError("WebSocketServices collection is NULL. Cannot count connected senders.");
+            return 0;
+        }
+
+        WebSocketServiceHost sendServiceHost;
+        if (services.TryGetServiceHost($"/{nameof(BroadcastSenderBehavior)}", out sendServiceHost) && sendServiceHost != null)
+        {
+            return sendServiceHost.Sessions.Count;
+        }
+
+        Debug.LogWarning($"No service host found for {nameof(BroadcastSenderBehavior)}. Returning 0 connected senders.");
+        return 0;
+    }
+
     void OnDestroy()
     {
         StopServer();

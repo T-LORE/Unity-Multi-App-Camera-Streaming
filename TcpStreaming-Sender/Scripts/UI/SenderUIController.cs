@@ -78,6 +78,7 @@ public class SenderUIController : MonoBehaviour
     [Header("Server")]
     [SerializeField] private Sender _sender;
     [SerializeField] private float _updateCheckWaitTime;
+    [SerializeField] private float _averageBitratePeriod = 5f;
 
     [SerializeField] private GameObject _canvasGameObject;
 
@@ -91,6 +92,7 @@ public class SenderUIController : MonoBehaviour
     [SerializeField] private Text _IPValue;
     [SerializeField] private Text _timerValue;
     [SerializeField] private Text _currentBitrateValue;
+    [SerializeField] private Text _connectedReceivers;
 
     [Header("Settings")]
     [SerializeField] private GameObject _settingsGameObject;
@@ -171,7 +173,6 @@ public class SenderUIController : MonoBehaviour
         UpdateStreamSettings();
         
         _serverStartTime = Time.time;
-        StartCoroutine(_updateServerInfoCoroutine);
 
         _settingsGameObject.SetActive(false);
         _infoGameObject.SetActive(true);
@@ -183,6 +184,8 @@ public class SenderUIController : MonoBehaviour
         _translationOn.gameObject.SetActive(true);
 
         _sender.StartSendingFrames();
+
+        StartCoroutine(_updateServerInfoCoroutine);
         Debug.Log($"Start stream button clicked!");
         Debug.Log($"Stream settings: {_streamSettings}");
     }
@@ -210,7 +213,14 @@ public class SenderUIController : MonoBehaviour
         {
             _IPValue.text = $"{_sender.GetIP()}:{_sender.GetPort()}";
             _timerValue.text = $"{(int)(Time.time - _serverStartTime) / 3600:D2}:{(int)(Time.time - _serverStartTime) / 60 % 60:D2}:{(int)(Time.time - _serverStartTime) % 60:D2}";
-            _currentBitrateValue.text = $"NaN";
+            
+            float avgKbps = _sender.GetAverageBytesPerSecond(_averageBitratePeriod) / 1024;
+            
+            avgKbps = Mathf.Round(avgKbps * 100f) / 100f;
+
+            _currentBitrateValue.text = $"{avgKbps} Κα/ρ";
+
+            _connectedReceivers.text = _sender.GetRecieversAmount().ToString();
             yield return new WaitForSeconds(_updateCheckWaitTime);
         }
     }

@@ -169,6 +169,24 @@ public class Sender : MonoBehaviour
         return AddressConfigurator.GetLocalPort();
     }
 
+    public int GetRecieversAmount()
+    {
+        return _mediaWebsocketServer.GetConnectedReceiversCount();
+
+    }
+
+    public float GetAverageBytesPerSecond(float timeRangeSeconds)
+    {
+        int receiversCount = _mediaWebsocketServer.GetConnectedReceiversCount();
+        if (receiversCount == 0)
+        {
+            return 0f;
+        }
+
+
+        return _mediaWebsocketClient.byteLogger.GetAverage(timeRangeSeconds) * receiversCount;
+    }
+
     [ContextMenu("Start Server")]
     private void StartServer()
     {
