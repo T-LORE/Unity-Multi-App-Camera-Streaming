@@ -106,6 +106,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Receiver UI
       objectReference: {fileID: 0}
+    - target: {fileID: 395082785148806433, guid: 6c6ce0c1078111d48b4d808e47704fc5,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -102.80003
+      objectReference: {fileID: 0}
     - target: {fileID: 2336280335656258962, guid: 6c6ce0c1078111d48b4d808e47704fc5,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -155,6 +160,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6319888249645359697, guid: 6c6ce0c1078111d48b4d808e47704fc5,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6322596606874447196, guid: 6c6ce0c1078111d48b4d808e47704fc5,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -89
       objectReference: {fileID: 0}
     - target: {fileID: 8346973178946742139, guid: 6c6ce0c1078111d48b4d808e47704fc5,
         type: 3}
