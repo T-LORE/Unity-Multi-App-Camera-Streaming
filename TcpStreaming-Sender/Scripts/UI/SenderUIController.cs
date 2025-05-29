@@ -346,7 +346,7 @@ public class SenderUIController : MonoBehaviour
             case 1: //200 Kbps
                 return new StreamSettings { 
                     ResX = 640,
-                    ResY = 480,
+                    ResY = 360,
                     MJPGQuality = 30,
                     FrameRate = 24,
                     ColorDepth = ColorDepthEnum.RGB565,
@@ -356,9 +356,9 @@ public class SenderUIController : MonoBehaviour
                 case 2: //500 Kbps
                 return new StreamSettings
                 {
-                    ResX = 1280,
-                    ResY = 720,
-                    MJPGQuality = 50,
+                    ResX = 854,
+                    ResY = 480,
+                    MJPGQuality = 70,
                     FrameRate = 30,
                     ColorDepth = ColorDepthEnum.ARGB32,
                     Delay = _delay.value,
@@ -367,8 +367,8 @@ public class SenderUIController : MonoBehaviour
                 case 3: //1000 Kbps
                 return new StreamSettings
                 {
-                    ResX = 1920,
-                    ResY = 1080,
+                    ResX = 1280,
+                    ResY = 720,
                     FrameRate = 60,
                     MJPGQuality = 85,
                     ColorDepth = ColorDepthEnum.ARGB32,
@@ -454,9 +454,9 @@ public class SenderUIController : MonoBehaviour
         switch (_resolution.value ) 
         { 
             case 0:
-                return new Vector2(1920, 1080);
-            case 1:
                 return new Vector2(1280, 720);
+            case 1:
+                return new Vector2(640, 360);
         }
         return Vector2.zero;
     }

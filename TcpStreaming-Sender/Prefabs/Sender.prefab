@@ -50,6 +50,7 @@ MonoBehaviour:
     ResX: 300
     ResY: 200
     FrameRate: 30
+    MJPGQuality: 100
     ColorDepth: 0
     Delay: 0
     Codec: 0
@@ -123,6 +124,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 8629678601869248777}
     m_Modifications:
+    - target: {fileID: 403668536616956671, guid: 2f596c68e34ce7d4bbf563335b0390e4,
+        type: 3}
+      propertyPath: m_Text
+      value: HD (1280x720)
+      objectReference: {fileID: 0}
     - target: {fileID: 432940259087761093, guid: 2f596c68e34ce7d4bbf563335b0390e4,
         type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -327,6 +333,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_ConstrainProportionsScale
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4108334194918326354, guid: 2f596c68e34ce7d4bbf563335b0390e4,
+        type: 3}
+      propertyPath: m_Options.m_Options.Array.data[0].m_Text
+      value: HD (1280x720)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4108334194918326354, guid: 2f596c68e34ce7d4bbf563335b0390e4,
+        type: 3}
+      propertyPath: m_Options.m_Options.Array.data[1].m_Text
+      value: SD (640x360)
       objectReference: {fileID: 0}
     - target: {fileID: 4196197306371679576, guid: 2f596c68e34ce7d4bbf563335b0390e4,
         type: 3}
