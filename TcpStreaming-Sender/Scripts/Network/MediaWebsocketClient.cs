@@ -72,7 +72,7 @@ public class MediaWebsocketClient : MonoBehaviour
         Debug.Log($"Attempting to connect to WebSocket server at {url}");
         Status = ClientStatus.Connecting;
         _ws = new WebSocket(url);
-        _ws.WaitTime = TimeSpan.FromSeconds(10); 
+        _ws.WaitTime = TimeSpan.FromSeconds(5); 
 
 
         _ws.OnOpen += OnOpenConnection;
