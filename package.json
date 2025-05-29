@@ -1,5 +1,5 @@
 {
-  "name": "com.tlore.unity-camera-streaming",
+  "name": "com.tlore.unity-multi-app-camera-streaming",
   "version": "2.0.0",
   "displayName": "Unity Camera Streaming",
   "samples": [
@@ -16,7 +16,7 @@
     {
       "displayName": "Sender/Receiver Samples",
       "description": "Contains sample setup for sender and receiver together",
-      "path": "Samples~/SampleSenderReceiver"
+      "path": "Samples~/SamplesSenderReceiver"
     }
   ],
   "dependencies": {
