@@ -13,6 +13,8 @@ public class StreamSettings
 
     public int FrameRate;
 
+    public int MJPGQuality = 70;
+
     public enum ColorDepthEnum
     {
         ARGB32,
@@ -323,7 +325,7 @@ public class SenderUIController : MonoBehaviour
         switch (_bitrate.value)
         {
             case 1:
-                _bitrateCurrentLabel.text = "100 Κα/Ρ";
+                _bitrateCurrentLabel.text = "200 Κα/Ρ";
                 break;
             case 2:
                 _bitrateCurrentLabel.text = "500 Κα/Ρ";
@@ -341,11 +343,12 @@ public class SenderUIController : MonoBehaviour
     {
         switch (_bitrate.value)
         {
-            case 1: //100 Kbps
+            case 1: //200 Kbps
                 return new StreamSettings { 
                     ResX = 640,
                     ResY = 480,
-                    FrameRate = 30,
+                    MJPGQuality = 30,
+                    FrameRate = 24,
                     ColorDepth = ColorDepthEnum.RGB565,
                     Delay = _delay.value,
                     Codec = CodecEnum.MJPG
@@ -355,8 +358,9 @@ public class SenderUIController : MonoBehaviour
                 {
                     ResX = 1280,
                     ResY = 720,
+                    MJPGQuality = 50,
                     FrameRate = 30,
-                    ColorDepth = ColorDepthEnum.RGB565,
+                    ColorDepth = ColorDepthEnum.ARGB32,
                     Delay = _delay.value,
                     Codec = CodecEnum.MJPG
                 };
@@ -366,9 +370,10 @@ public class SenderUIController : MonoBehaviour
                     ResX = 1920,
                     ResY = 1080,
                     FrameRate = 60,
+                    MJPGQuality = 85,
                     ColorDepth = ColorDepthEnum.ARGB32,
                     Delay = _delay.value,
-                    Codec = CodecEnum.MGP
+                    Codec = CodecEnum.MJPG
                 };
                 default:
                 return new StreamSettings

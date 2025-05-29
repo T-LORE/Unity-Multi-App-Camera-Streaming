@@ -19,7 +19,7 @@ public class TextureEncoder
         switch (_streamSettings.Codec)
         {
             case StreamSettings.CodecEnum.MJPG:
-                dataBytes = texture.EncodeToJPG(80);
+                dataBytes = texture.EncodeToJPG(_streamSettings.MJPGQuality);
                 break;
             case StreamSettings.CodecEnum.MGP:
                 dataBytes = texture.EncodeToPNG();
