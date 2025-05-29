@@ -43,6 +43,9 @@ public class Sender : MonoBehaviour
         get { return _streamStartTime; }
     }
 
+    private string _ip;
+    private string _port;
+
     private void Start()
     {
         _textureCapturer = new TextureCapturer(_targetCamera, streamSettings);
@@ -118,18 +121,43 @@ public class Sender : MonoBehaviour
     }
 
     [ContextMenu("Start Sending Frames")]
-    public void StartSendingFrames()
+    public bool StartSendingFramesAutoIP()
     {
         if (_sendFrames)
         {
             Debug.LogWarning("Already sending frames.");
-            return;
+            return true;
         }
 
         _streamStartTime = Time.time;
         _sendFrames = true;
-        StartServer();
+        bool res = StartServerAutoIP();
+        if (!res)
+        {
+            Debug.LogWarning("Failed to start server with auto IP.");
+            return false;
+        }
         _sendFramesCoroutine = StartCoroutine(SendFramesCoroutine());
+        return true;
+    }
+
+    public bool StartSendingFrames(string ip, string port)
+    {
+        if (_sendFrames)
+        {
+            Debug.LogWarning("Already sending frames.");
+            return false;
+        }
+
+        _streamStartTime = Time.time;
+        _sendFrames = true;
+        bool res = StartServer(ip, port);
+        if (!res)
+        {
+            return false;
+        }
+        _sendFramesCoroutine = StartCoroutine(SendFramesCoroutine());
+        return true;
     }
 
     [ContextMenu("Stop Sending Frames")]
@@ -155,7 +183,7 @@ public class Sender : MonoBehaviour
             return "ERROR";
         }
 
-        return AddressConfigurator.GetLocalIP();
+        return _ip;
     }
 
     public string GetPort()
@@ -166,7 +194,7 @@ public class Sender : MonoBehaviour
             return "ERROR";
         }
 
-        return AddressConfigurator.GetLocalPort();
+        return _port;
     }
 
     public int GetRecieversAmount()
@@ -188,12 +216,45 @@ public class Sender : MonoBehaviour
     }
 
     [ContextMenu("Start Server")]
-    private void StartServer()
+    private bool StartServerAutoIP()
     {
-        string ip = AddressConfigurator.GetLocalIP();
-        string port = AddressConfigurator.GetLocalPort();
-        _mediaWebsocketServer.StartServer(ip, port);
+        _ip = AddressConfigurator.GetLocalIP();
+        _port = AddressConfigurator.GetLocalPort();
+        bool res = false;
+        for (int i = 0; i < 10; i++)
+        {
+            _port = (i == 0) ? _port : (int.Parse(_port) + i).ToString();
+            if (StartServer(_ip, _port))
+            {
+                Debug.Log($"Server started on {_ip}:{_port}");
+                res = true;
+                break;
+            }
+            else
+            {
+                Debug.LogWarning($"Failed to start server on {_ip}:{_port}, retrying...");
+                System.Threading.Thread.Sleep(1000); // Wait for a second before retrying
+            }
+        }
+        if (!res)
+        {
+            Debug.LogWarning("Failed to start server after multiple attempts.");
+            return false;
+        }
+        Debug.Log("Auto IP server started successfully.");
+        _mediaWebsocketClient.ConnectToServer(_ip, _port, nameof(BroadcastSenderBehavior));
+        return true;
+    }
+
+    private bool StartServer(string ip, string port)
+    {
+        bool res = _mediaWebsocketServer.StartServer(ip, port);
+        if (!res)
+            return res;
+        _ip = ip;
+        _port = port;
         _mediaWebsocketClient.ConnectToServer(ip, port, nameof(BroadcastSenderBehavior));
+        return res;
     }
 
     [ContextMenu("Stop Server")]

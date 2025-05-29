@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.UI;
 using static StreamSettings;
@@ -116,6 +117,12 @@ public class SenderUIController : MonoBehaviour
 
     [SerializeField] private Dropdown _frameRate;
 
+    [SerializeField] private Toggle _isAutoAddress;
+    [SerializeField] private GameObject _addressConfiguratorGameObject;
+    [SerializeField] private InputField _portInput;
+    [SerializeField] private InputField _ipAddressInput;
+    [SerializeField] private Text _errorField;
+
     [Header("Control buttons")]
     [SerializeField] private GameObject _controlButtonsGameObject;
     [SerializeField] private Button _startStreamButton;
@@ -136,6 +143,17 @@ public class SenderUIController : MonoBehaviour
         _usePresetsWithBitrate.onValueChanged.AddListener(y => OnPresetsWithBitrateToggle());
         _startStreamButton.onClick.AddListener(StartStreamButtonClicked);
         _endStreamButton.onClick.AddListener(StopStreamButtonClicked);
+        _isAutoAddress.onValueChanged.AddListener((val) =>
+        {
+            if (_isAutoAddress.isOn)
+            {
+                _addressConfiguratorGameObject.SetActive(false);
+            }
+            else
+            {
+                _addressConfiguratorGameObject.SetActive(true);
+            }
+        });
     }
 
     private void Update()
@@ -168,10 +186,69 @@ public class SenderUIController : MonoBehaviour
         }
     }
 
+    private List<string> ValidateAddress()
+    {
+        string ip = _ipAddressInput.text.Trim();
+        string port = _portInput.text.Trim();
+
+        var errors = new List<string>();
+
+        if (!Regex.IsMatch(ip, @"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"))
+        {
+            errors.Add("Неверный IP адресс" );
+        }
+
+        if (!Regex.IsMatch(port, @"^\d{1,5}$") || !ushort.TryParse(port, out ushort portValue) || portValue == 0)
+        {
+            errors.Add("Неверный порт");
+        }
+
+        return errors;
+    }
+
     private void StartStreamButtonClicked()
     {
         UpdateStreamSettings();
-        
+        bool res;
+
+        if (_isAutoAddress.isOn)
+        {
+            res = _sender.StartSendingFramesAutoIP();
+
+            if (!res)
+            {
+                _errorField.text = "Ошибка при запуске сервера на автоматическом IP, используйте ручной ввод";
+                Debug.LogWarning("Error starting server on auto IP, please use manual input");
+                return;
+            }
+        } else
+        {
+            string errorText = "";
+
+            if (ValidateAddress().Count > 0)
+            {
+                foreach (var error in ValidateAddress())
+                {
+                    errorText += error + "\n";
+                    Debug.LogError(error);
+                }
+
+                _errorField.text = errorText;
+
+                return;
+            }
+            
+
+            res = _sender.StartSendingFrames(_ipAddressInput.text.Trim(), _portInput.text.Trim());
+
+            if (!res)
+            {
+                _errorField.text = "Ошибка при запуске сервера на адресе " + _ipAddressInput.text.Trim() + ":" + _portInput.text.Trim() + "\n пожалуйста используйте локальный IP адресс вашей машины";
+                Debug.LogWarning($"Error starting server on address {_ipAddressInput.text.Trim()}:{_portInput.text.Trim()}");
+                return;
+            }
+        }
+
         _serverStartTime = Time.time;
 
         _settingsGameObject.SetActive(false);
@@ -183,11 +260,10 @@ public class SenderUIController : MonoBehaviour
         _translationOff.gameObject.SetActive(false);
         _translationOn.gameObject.SetActive(true);
 
-        _sender.StartSendingFrames();
-
         StartCoroutine(_updateServerInfoCoroutine);
         Debug.Log($"Start stream button clicked!");
         Debug.Log($"Stream settings: {_streamSettings}");
+        _errorField.text = "";
     }
 
     private void StopStreamButtonClicked()
