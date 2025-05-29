@@ -13,6 +13,10 @@ public class Receiver : MonoBehaviour
     [SerializeField]
     private RawImage _displayImage;
 
+    [SerializeField]
+    private float _maxTimeBetweenPackets = 3.0f;
+    private float _lastPacketTime;
+
     private FrameDecoder _frameDecoder;
 
     private Texture2D _receivedTexture;
@@ -20,6 +24,12 @@ public class Receiver : MonoBehaviour
     public UnityAction OnConnectionError;
 
     public UnityAction<CloseEventArgs> OnDisconnect;
+
+    public UnityAction OnConnectionLost;
+
+    public UnityAction OnOpen;
+
+    public bool IsConnectionLost { get; private set; }
 
     public Texture2D ReceivedTexture
     {
@@ -58,12 +68,43 @@ public class Receiver : MonoBehaviour
             OnDisconnect?.Invoke(e);
         };
 
+        _mediaWebsocketClient.OnOpenAction += () =>
+        {
+            OnOpen?.Invoke();
+        };
 
+
+    }
+
+    public void Update()
+    {
+        
+        if (!IsConnectionLost && _mediaWebsocketClient.Status == MediaWebsocketClient.ClientStatus.Connected)
+        {
+            if (Time.time - _lastPacketTime > _maxTimeBetweenPackets)
+            {
+                Debug.LogWarning("Connection lost");
+                IsConnectionLost = true;
+                OnConnectionLost?.Invoke();
+            }
+        }
+
+        if (_mediaWebsocketClient.Status == MediaWebsocketClient.ClientStatus.Connected && IsConnectionLost)
+        {
+            if (Time.time - _lastPacketTime < _maxTimeBetweenPackets)
+            {
+                Debug.Log("Connection restored");
+                IsConnectionLost = false;
+            }
+        }
+        
     }
 
     public void Connect(string ip, int port)
     {
         _mediaWebsocketClient.ConnectToServer(ip, port.ToString(), nameof(BroadcastReceiveBehavior));
+        _lastPacketTime = Time.time;
+        IsConnectionLost = false;
     }
 
     public string GetConnectedIP()
@@ -90,6 +131,11 @@ public class Receiver : MonoBehaviour
         _mediaWebsocketClient.DisconnectFromServer();
     }
 
+    public void DisconnectAsync()
+    {
+        _mediaWebsocketClient.DisconnectFromServerAsync();
+    }
+
     private void FrameRecieved(MessageEventArgs args)
     {
         byte[] imageData = args.RawData;    
@@ -108,5 +154,7 @@ public class Receiver : MonoBehaviour
         {
             _displayImage.texture = frameTexture;
         }
+
+        _lastPacketTime = Time.time;
     }
 }

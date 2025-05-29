@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -71,12 +72,13 @@ public class MediaWebsocketClient : MonoBehaviour
         Debug.Log($"Attempting to connect to WebSocket server at {url}");
         Status = ClientStatus.Connecting;
         _ws = new WebSocket(url);
+        _ws.WaitTime = TimeSpan.FromSeconds(10); 
+
 
         _ws.OnOpen += OnOpenConnection;
         _ws.OnMessage += OnRecieveMessage;
         _ws.OnError += OnRecieveError;
         _ws.OnClose += OnCloseConenction;
-
         return TryConnect();
     }
 
@@ -127,7 +129,7 @@ public class MediaWebsocketClient : MonoBehaviour
 
     public bool DisconnectFromServer()
     {
-        if (_ws != null && _ws.IsAlive)
+        if (_ws != null)
         {
             _ws.Close();
             Debug.Log("Disconnected from WebSocket server.");
@@ -135,7 +137,22 @@ public class MediaWebsocketClient : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("WebSocket is not connected.");
+            Debug.LogWarning($"WebSocket is not connected.");
+            return false;
+        }
+    }
+
+    public bool DisconnectFromServerAsync()
+    {
+        if (_ws != null)
+        {
+            _ws.CloseAsync();
+            Debug.Log("Disconnected from WebSocket server.");
+            return true;
+        }
+        else
+        {
+            Debug.LogWarning($"WebSocket is not connected.");
             return false;
         }
     }
@@ -187,6 +204,7 @@ public class MediaWebsocketClient : MonoBehaviour
 
     private void OnRecieveError(object sender, ErrorEventArgs e)
     {
+        Debug.Log($"OnRecieveError {e.Message}");
         
         if (e.Exception != null)
         {

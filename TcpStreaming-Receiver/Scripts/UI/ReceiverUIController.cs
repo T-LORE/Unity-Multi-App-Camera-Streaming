@@ -9,7 +9,9 @@ public class ReceiverUIController : MonoBehaviour
 {
     [Header("Receiver")]
     [SerializeField] private Receiver _receiver;
-    [SerializeField] private float _reconnectionDelaySeconds = 3f;
+    [SerializeField] private float _reconnectionDelaySeconds = 5f;
+    [SerializeField] private float _maxReconnectionTime = 10f;
+    [SerializeField] private int _maxConnectionAttempts = 5;
 
     [Header("Canvas")]
     [SerializeField] private GameObject _canvasGameObject;
@@ -29,6 +31,7 @@ public class ReceiverUIController : MonoBehaviour
     [SerializeField] private InputField _IP;
     [SerializeField] private InputField _port;
     [SerializeField] private Text _streamEndedAlert;
+    
 
     [Header("Stream Status")]
     [SerializeField] private GameObject _streamVideoGameObject;
@@ -42,11 +45,12 @@ public class ReceiverUIController : MonoBehaviour
     [SerializeField] private Button _connectButton;
     [SerializeField] private Button _disconnectButton;
 
-    private Coroutine _reconnectionCoroutine;
+    private Coroutine _connectingTimer;
+    private float _startReconnectionTime;
 
     private Panel _currentPanel;
     private bool _isDisconnectedButtonClicked;
-    private bool _isReconnecting = false;
+    private bool _isConneecting;
     
 
     enum Panel
@@ -76,19 +80,16 @@ public class ReceiverUIController : MonoBehaviour
         SwitchUIPanelTo(Panel.NotConnected);
         _connectButton.onClick.AddListener(ConnectButtonClicked);
         _disconnectButton.onClick.AddListener(DisconnectButtonClicked);
+        _receiver.OnConnectionLost += OnConnectionLost;
 
         _receiver.OnDisconnect += (e) =>
         {
-            if (_isReconnecting)
-            {
-                return;
-            }
-
             if (e.WasClean)
             {
                 if (_isDisconnectedButtonClicked)
                 {
                     _isDisconnectedButtonClicked = false;
+                    _connectButton.interactable = true;
                 }
                 else
                 {
@@ -100,14 +101,24 @@ public class ReceiverUIController : MonoBehaviour
             if (_isDisconnectedButtonClicked)
             {
                 _isDisconnectedButtonClicked = false;
+                _connectButton.interactable = true;
                 return;
             }
 
-            Debug.LogError("Connection error occurred. Attempting to reconnect...");
+            if (_isConneecting)
+            {
+                ConnectButtonClicked();
+                return;
+            }
 
-            SwitchUIPanelTo(Panel.ReconnectionProgress);
-            _reconnectionCoroutine = StartCoroutine(ConnectionCoroutine());
-            
+            SwitchUIPanelTo(Panel.NotConnected);
+
+        };
+
+        _receiver.OnOpen += () =>
+        {
+            _isConneecting = false;
+            SwitchUIPanelTo(Panel.Connected);
         };
 
 
@@ -124,6 +135,41 @@ public class ReceiverUIController : MonoBehaviour
         {
             _video.texture = _receiver.ReceivedTexture;
         }
+    }
+
+    private void OnConnectionLost()
+    {
+        if (_isDisconnectedButtonClicked)
+            return;
+        Debug.Log("Waiting for signal restore...");
+
+        SwitchUIPanelTo(Panel.ReconnectionProgress);
+
+        _startReconnectionTime = Time.time;
+
+        StartCoroutine(ReconnectionTimer());
+    }
+
+    private IEnumerator ReconnectionTimer()
+    {
+        while (Time.time - _startReconnectionTime < _maxReconnectionTime)
+        {
+            if (!_receiver.IsConnectionLost)
+            {
+                SwitchUIPanelTo(Panel.Connected);
+                yield break;
+            }
+            yield return new WaitForSeconds(1f);
+        }
+
+        _receiver.DisconnectAsync();
+    }
+
+    private IEnumerator ConnectingTimer()
+    {
+        yield return new WaitForSeconds(5f);
+        if (_isConneecting)
+            _receiver.DisconnectAsync();
     }
 
     private void SwitchUIPanelTo(Panel newPanel)
@@ -297,33 +343,51 @@ public class ReceiverUIController : MonoBehaviour
         string ip = _IP.text.Trim();
         int port = ushort.Parse(_port.text.Trim());
 
+        _isConneecting = true;
+        _connectingTimer = StartCoroutine(ConnectingTimer());
         SwitchUIPanelTo(Panel.ConnectionProgress);
 
-        _reconnectionCoroutine = StartCoroutine(ConnectionCoroutine());
-        _IPPortValue.text = $"{_receiver.GetConnectedIP()}:{_receiver.GetConnectedPort()}";
+        _receiver.Connect(_IP.text.Trim(), ushort.Parse(_port.text.Trim()));
+        _IPPortValue.text = $"{ip}:{port}";
 
     }
 
     private void DisconnectButtonClicked()
     {
-        StopCoroutine(_reconnectionCoroutine);
-        _isReconnecting = false;
+        StopAllCoroutines();
+
+        _isConneecting = false;
 
         _isDisconnectedButtonClicked = true;
-        _receiver.Disconnect();
+        
+        _receiver.DisconnectAsync();
+        _connectButton.interactable = false;
 
         SwitchUIPanelTo(Panel.NotConnected);
     }
 
+    /*
     private IEnumerator ConnectionCoroutine()
     {
+        int attempts = 0;
+
         _isReconnecting = true;
 
         while (_receiver.Status != MediaWebsocketClient.ClientStatus.Connected)
         {
+            attempts++;
+
+            if (attempts > _maxConnectionAttempts)
+            {
+                Debug.LogWarning("Max connection attempts reached. Stopping reconnection attempts.");
+                SwitchUIPanelTo(Panel.NotConnected);
+                _isReconnecting = false;
+                yield break;
+            }
+
             Debug.Log("Attempting to reconnect...");
             
-            _receiver.Connect(_IP.text.Trim(), ushort.Parse(_port.text.Trim()));
+            
 
             yield return new WaitForSeconds(_reconnectionDelaySeconds);
         }
@@ -341,5 +405,12 @@ public class ReceiverUIController : MonoBehaviour
             SwitchUIPanelTo(Panel.NotConnected);
         }
 
+    }
+    */
+
+    private void OnDisable()
+    {
+        _receiver.Disconnect();
+        StopAllCoroutines();
     }
 }
