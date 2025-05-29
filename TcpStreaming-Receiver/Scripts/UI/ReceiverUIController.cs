@@ -97,6 +97,7 @@ public class ReceiverUIController : MonoBehaviour
                 else
                 {
                     SwitchUIPanelTo(Panel.StreamEndedOnServer);
+                    _connectButton.interactable = true;
                 }
                 return;
             }
