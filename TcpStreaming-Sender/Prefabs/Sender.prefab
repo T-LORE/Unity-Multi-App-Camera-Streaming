@@ -124,6 +124,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 8629678601869248777}
     m_Modifications:
+    - target: {fileID: 97100748509345400, guid: 2f596c68e34ce7d4bbf563335b0390e4,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0.000040054
+      objectReference: {fileID: 0}
     - target: {fileID: 403668536616956671, guid: 2f596c68e34ce7d4bbf563335b0390e4,
         type: 3}
       propertyPath: m_Text
@@ -137,6 +142,16 @@ PrefabInstance:
     - target: {fileID: 495331611191368697, guid: 2f596c68e34ce7d4bbf563335b0390e4,
         type: 3}
       propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 562444392426952199, guid: 2f596c68e34ce7d4bbf563335b0390e4,
+        type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 562444392426952199, guid: 2f596c68e34ce7d4bbf563335b0390e4,
+        type: 3}
+      propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 744435317042813275, guid: 2f596c68e34ce7d4bbf563335b0390e4,
@@ -458,6 +473,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_ConstrainProportionsScale
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8197644040343852838, guid: 2f596c68e34ce7d4bbf563335b0390e4,
+        type: 3}
+      propertyPath: m_Options.m_Options.Array.data[1].m_Text
+      value: "MNG (\u0430\u043B\u044C\u0444\u0430 \u043A\u0430\u043D\u0430\u043B)"
       objectReference: {fileID: 0}
     - target: {fileID: 8278889148199483103, guid: 2f596c68e34ce7d4bbf563335b0390e4,
         type: 3}
