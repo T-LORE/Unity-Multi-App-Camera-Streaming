@@ -31,6 +31,7 @@ public class ReceiverUIController : MonoBehaviour
     [SerializeField] private InputField _IP;
     [SerializeField] private InputField _port;
     [SerializeField] private Text _streamEndedAlert;
+    [SerializeField] private Text _connectionLostAlert;
     
 
     [Header("Stream Status")]
@@ -58,6 +59,7 @@ public class ReceiverUIController : MonoBehaviour
         None,
         NotConnected,
         StreamEndedOnServer,
+        ConnectionLost,
         ConnectionProgress,
         ReconnectionProgress,
         Connected
@@ -111,8 +113,7 @@ public class ReceiverUIController : MonoBehaviour
                 return;
             }
 
-            SwitchUIPanelTo(Panel.NotConnected);
-
+            _connectButton.interactable = true;
         };
 
         _receiver.OnOpen += () =>
@@ -146,7 +147,7 @@ public class ReceiverUIController : MonoBehaviour
         SwitchUIPanelTo(Panel.ReconnectionProgress);
 
         _startReconnectionTime = Time.time;
-
+        _connectButton.interactable = false;
         StartCoroutine(ReconnectionTimer());
     }
 
@@ -161,6 +162,7 @@ public class ReceiverUIController : MonoBehaviour
             }
             yield return new WaitForSeconds(1f);
         }
+        SwitchUIPanelTo(Panel.ConnectionLost);
 
         _receiver.DisconnectAsync();
     }
@@ -185,6 +187,18 @@ public class ReceiverUIController : MonoBehaviour
         {
             case Panel.StreamEndedOnServer:
                 _streamEndedAlert.gameObject.SetActive(true);
+
+                _statusGameObject.SetActive(true);
+                _streamOff.gameObject.SetActive(true);
+
+
+                _settingsGameObject.SetActive(true);
+
+                _controlButtonsGameObject.gameObject.SetActive(true);
+                _connectButton.gameObject.SetActive(true);
+                break;
+            case Panel.ConnectionLost:
+                _connectionLostAlert.gameObject.SetActive(true);
 
                 _statusGameObject.SetActive(true);
                 _streamOff.gameObject.SetActive(true);
@@ -248,6 +262,17 @@ public class ReceiverUIController : MonoBehaviour
         {
             case Panel.StreamEndedOnServer:
                 _streamEndedAlert.gameObject.SetActive(false);
+
+                _statusGameObject.SetActive(false);
+                _streamOff.gameObject.SetActive(false);
+
+                _settingsGameObject.SetActive(false);
+
+                _controlButtonsGameObject.gameObject.SetActive(false);
+                _connectButton.gameObject.SetActive(false);
+                break;            
+            case Panel.ConnectionLost:
+                _connectionLostAlert.gameObject.SetActive(false);
 
                 _statusGameObject.SetActive(false);
                 _streamOff.gameObject.SetActive(false);
