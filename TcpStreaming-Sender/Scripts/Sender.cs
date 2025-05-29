@@ -53,6 +53,16 @@ public class Sender : MonoBehaviour
         _frameDecoder = new FrameDecoder(new Vector2(2,2));
         _framesQueue = new FramesQueue();
 
+        if (_targetCamera == null)
+        {
+            Debug.LogWarning("Target camera is not set. Main camera set by default");
+            _targetCamera = Camera.main;
+            if (_targetCamera == null)
+            {
+                Debug.LogError("No camera found in the scene. Please assign a camera to the Sender.");
+            }
+        }
+
     }
 
     [ContextMenu("update settings")]
