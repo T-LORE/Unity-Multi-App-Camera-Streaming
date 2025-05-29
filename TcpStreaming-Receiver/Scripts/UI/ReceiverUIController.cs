@@ -9,9 +9,7 @@ public class ReceiverUIController : MonoBehaviour
 {
     [Header("Receiver")]
     [SerializeField] private Receiver _receiver;
-    [SerializeField] private float _reconnectionDelaySeconds = 5f;
     [SerializeField] private float _maxReconnectionTime = 10f;
-    [SerializeField] private int _maxConnectionAttempts = 5;
 
     [Header("Canvas")]
     [SerializeField] private GameObject _canvasGameObject;

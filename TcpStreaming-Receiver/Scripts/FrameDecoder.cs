@@ -7,7 +7,6 @@ public class FrameDecoder
     private Vector2 _frameSize = new Vector2(640, 480);
     private Texture2D _reusableTexture;
 
-    private bool _success = false;
     private byte[] _frameData;
     public FrameDecoder(Vector2 frameSize)
     {
