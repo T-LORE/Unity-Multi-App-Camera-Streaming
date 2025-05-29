@@ -459,16 +459,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Receiver
       objectReference: {fileID: 0}
-    - target: {fileID: 3115399290608805691, guid: af2322eb6e477f34ca2570e0622a5c7a,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4674044633741298848, guid: af2322eb6e477f34ca2570e0622a5c7a,
-        type: 3}
-      propertyPath: _displayImage
-      value: 
-      objectReference: {fileID: 0}
     - target: {fileID: 6975314338514040752, guid: af2322eb6e477f34ca2570e0622a5c7a,
         type: 3}
       propertyPath: m_LocalPosition.x
