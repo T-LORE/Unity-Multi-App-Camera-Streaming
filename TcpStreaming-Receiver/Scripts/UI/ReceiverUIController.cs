@@ -32,6 +32,7 @@ public class ReceiverUIController : MonoBehaviour
     [SerializeField] private InputField _port;
     [SerializeField] private Text _streamEndedAlert;
     [SerializeField] private Text _connectionLostAlert;
+    [SerializeField] private Text _invalidInputErrors;
     
 
     [Header("Stream Status")]
@@ -343,12 +344,12 @@ public class ReceiverUIController : MonoBehaviour
 
         if (!Regex.IsMatch(ip, @"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"))
         {
-            errors.Add(new ValidationError { Message = "Invalid IP adress" });
+            errors.Add(new ValidationError { Message = "Неверный IP адресс" });
         }
         
         if (!Regex.IsMatch(port, @"^\d{1,5}$") || !ushort.TryParse(port, out ushort portValue) || portValue == 0)
         {
-            errors.Add(new ValidationError { Message = "Invalid port" });
+            errors.Add(new ValidationError { Message = "Неверный порт" });
         }
 
         return errors;
@@ -356,14 +357,21 @@ public class ReceiverUIController : MonoBehaviour
 
     private void ConnectButtonClicked()
     {
+        string errorText = "";
+
         if (ValidateAddress().Count > 0)
         {
             foreach (var error in ValidateAddress())
             {
+                errorText += error.Message + "\n";
                 Debug.LogError(error.Message);
             }
+            _invalidInputErrors.text = errorText;
+
             return;
         }
+        
+        _invalidInputErrors.text = "";
 
         string ip = _IP.text.Trim();
         int port = ushort.Parse(_port.text.Trim());

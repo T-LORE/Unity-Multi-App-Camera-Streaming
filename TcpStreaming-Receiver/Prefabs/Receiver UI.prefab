@@ -61,6 +61,7 @@ MonoBehaviour:
   _port: {fileID: 6798799030818523914}
   _streamEndedAlert: {fileID: 5101833528959414498}
   _connectionLostAlert: {fileID: 4604973403544486341}
+  _invalidInputErrors: {fileID: 1881252527770745686}
   _streamVideoGameObject: {fileID: 7650721740871271901}
   _IPPortValue: {fileID: 467227105335141707}
   _video: {fileID: 1258197956522120944}
@@ -693,7 +694,7 @@ MonoBehaviour:
   m_LineType: 0
   m_HideMobileInput: 0
   m_CharacterValidation: 0
-  m_CharacterLimit: 0
+  m_CharacterLimit: 15
   m_OnSubmit:
     m_PersistentCalls:
       m_Calls: []
@@ -1364,8 +1365,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u041D\u0435\u0432\u0435\u0440\u043D\u044B\u0439 IP\n\u041D\u0435\u0432\u0435\u0440\u043D\u044B\u0439
-    \u041F\u043E\u0440\u0442"
+  m_Text: 
 --- !u!1 &3843233484304698340
 GameObject:
   m_ObjectHideFlags: 0
