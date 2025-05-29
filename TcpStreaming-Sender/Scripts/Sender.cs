@@ -268,16 +268,18 @@ public class Sender : MonoBehaviour
     {
         if (streamSettings.Delay > 0.2)
         {
-            Frame delayFrame = new Frame(Time.time, _delayJpgPic.EncodeToJPG(100));
+            Debug.Log("Delay started, sending delay frame.");
+            Frame delayFrame = new Frame(Time.time, _delayJpgPic.EncodeToJPG(20));
             while (Time.time - _streamStartTime < streamSettings.Delay)
             {
                 SendFrame(delayFrame);
-                yield return new WaitForSeconds(0.1f);
+                _framesQueue.Enqueue(PrepareFrame());
+                yield return new WaitForSeconds(1.0f / streamSettings.FrameRate);
             }
         }
 
-        Frame nextFrame = null;
-
+        Debug.Log($"Starting to send frames at {Time.time} seconds.");
+        Frame nextFrame = _framesQueue.Dequeue();
         while (_sendFrames)
         {
             _framesQueue.Enqueue(PrepareFrame());
@@ -287,11 +289,10 @@ public class Sender : MonoBehaviour
                 nextFrame = _framesQueue.Dequeue();
             }
 
-            if (Time.time - nextFrame.Time >= streamSettings.Delay)
-            {
-                SendFrame(nextFrame);
-                nextFrame = null;
-            }
+
+            SendFrame(nextFrame);
+            nextFrame = null;
+
             yield return new WaitForSeconds(1.0f / streamSettings.FrameRate);
             //Debug.Log($"Sent frame at {Time.time} seconds. {1 / streamSettings.FrameRate}");
         }
