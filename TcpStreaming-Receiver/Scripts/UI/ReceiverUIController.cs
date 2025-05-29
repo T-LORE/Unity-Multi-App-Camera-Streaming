@@ -135,7 +135,7 @@ public class ReceiverUIController : MonoBehaviour
 
         if (_receiver != null && _currentPanel == Panel.Connected)
         {
-            _video.texture = _receiver.ReceivedTexture;
+            //_video.texture = _receiver.ReceivedTexture;
         }
     }
 

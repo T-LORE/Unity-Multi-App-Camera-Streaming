@@ -47,7 +47,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _mediaWebsocketClient: {fileID: 829520386337059757}
-  _displayImage: {fileID: 0}
+  _displayImage: {fileID: 3145355475722502172}
   _maxTimeBetweenPackets: 3.5
 --- !u!1 &2940772644445415271
 GameObject:
@@ -172,3 +172,15 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 4238037074480633580}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &3145355475722502172 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1258197956522120944, guid: 6c6ce0c1078111d48b4d808e47704fc5,
+    type: 3}
+  m_PrefabInstance: {fileID: 4238037074480633580}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
