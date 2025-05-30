@@ -369,8 +369,8 @@ public class SenderUIController : MonoBehaviour
                 {
                     ResX = 1280,
                     ResY = 720,
-                    FrameRate = 60,
-                    MJPGQuality = 85,
+                    FrameRate = 55,
+                    MJPGQuality = 80,
                     ColorDepth = ColorDepthEnum.ARGB32,
                     Delay = _delay.value,
                     Codec = CodecEnum.MJPG
